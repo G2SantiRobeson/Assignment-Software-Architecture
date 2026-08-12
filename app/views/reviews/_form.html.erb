@@ -1,0 +1,8 @@
+<%= form_with model: review do |form| %>
+  <%= render "shared/form_errors", record: review %>
+  <div class="field"><%= form.label :book_id, "Book" %><%= form.collection_select :book_id, @books, :id, ->(book) { "#{book.name} — #{book.author.name}" }, { prompt: "Select a book" }, required: true %></div>
+  <div class="field"><%= form.label :review_text, "Review" %><%= form.text_area :review_text, required: true %></div>
+  <div class="field"><%= form.label :score %><%= form.number_field :score, min: 1, max: 5, step: 1, required: true %></div>
+  <div class="field"><%= form.label :up_votes, "Up-votes" %><%= form.number_field :up_votes, min: 0, step: 1, required: true %></div>
+  <div class="actions"><%= form.submit %><%= link_to "Cancel", review.persisted? ? review_path(review) : reviews_path, class: "button secondary" %></div>
+<% end %>

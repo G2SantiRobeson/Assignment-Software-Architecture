@@ -1,0 +1,24 @@
+<%= form_with model: author do |form| %>
+  <%= render "shared/form_errors", record: author %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true, autofocus: true %>
+  </div>
+  <div class="field">
+    <%= form.label :date_of_birth %>
+    <%= form.date_field :date_of_birth %>
+  </div>
+  <div class="field">
+    <%= form.label :country_of_origin %>
+    <%= form.text_field :country_of_origin %>
+  </div>
+  <div class="field">
+    <%= form.label :short_description %>
+    <%= form.text_area :short_description %>
+  </div>
+  <div class="actions">
+    <%= form.submit %>
+    <%= link_to "Cancel", author.persisted? ? author_path(author) : authors_path, class: "button secondary" %>
+  </div>
+<% end %>

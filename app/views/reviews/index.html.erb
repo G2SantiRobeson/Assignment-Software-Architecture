@@ -1,0 +1,5 @@
+<% content_for :title, "Reviews" %><div class="page-header"><h1>Reviews</h1><%= link_to "New review", new_review_path, class: "button" %></div>
+<div class="table-wrap"><table><thead><tr><th>Book</th><th>Score</th><th>Review</th><th>Up-votes</th><th>Actions</th></tr></thead><tbody>
+  <% @reviews.each do |review| %><tr><td><%= link_to review.book.name, review.book %><br><span class="muted"><%= review.book.author.name %></span></td><td><%= review.score %>/5</td><td class="review-copy"><%= link_to truncate(review.review_text, length: 150), review %></td><td><%= review.up_votes %></td><td><div class="actions"><%= link_to "Edit", edit_review_path(review) %><%= button_to "Delete", review, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this review?" } } %></div></td></tr><% end %>
+  <% if @reviews.empty? %><tr><td colspan="5" class="empty">No reviews have been added.</td></tr><% end %>
+</tbody></table></div>
