@@ -154,6 +154,7 @@ class ReviewsCrudTest < ActionDispatch::IntegrationTest
 
   test "edit, update, invalid update, and destroy" do
     review = Review.create!(book: create_book, review_text: "Original", score: 3, up_votes: 0)
+    deleted_review_path = review_path(review)
     get edit_review_path(review)
     assert_response :success
     patch review_path(review), params: { review: { review_text: "Updated", score: 4, up_votes: 2 } }
@@ -167,6 +168,12 @@ class ReviewsCrudTest < ActionDispatch::IntegrationTest
 
     assert_difference("Review.count", -1) { delete review_path(review) }
     assert_redirected_to reviews_path
+
+    get deleted_review_path
+    assert_response :see_other
+    assert_redirected_to reviews_path
+    follow_redirect!
+    assert_select ".flash.alert", text: "Review no longer exists."
   end
 end
 
@@ -217,5 +224,30 @@ class SalesCrudTest < ActionDispatch::IntegrationTest
     assert_difference("Sale.count", -1) { delete sale_path(sale) }
     assert_redirected_to sales_path
     assert_equal 0, sale.book.reload.number_of_sales
+  end
+end
+
+class MissingCrudRecordsTest < ActionDispatch::IntegrationTest
+  test "missing records redirect to their corresponding collection" do
+    {
+      author_path(missing_id_for(Author)) => [ authors_path, "Author" ],
+      book_path(missing_id_for(Book)) => [ books_path, "Book" ],
+      review_path(missing_id_for(Review)) => [ reviews_path, "Review" ],
+      sale_path(missing_id_for(Sale)) => [ sales_path, "Sale" ]
+    }.each do |missing_path, (collection_path, model_name)|
+      get missing_path
+
+      assert_response :see_other
+      assert_redirected_to collection_path
+      follow_redirect!
+      assert_response :success
+      assert_select ".flash.alert", text: "#{model_name} no longer exists."
+    end
+  end
+
+  private
+
+  def missing_id_for(model)
+    model.maximum(:id).to_i + 1
   end
 end

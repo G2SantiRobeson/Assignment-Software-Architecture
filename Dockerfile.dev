@@ -10,4 +10,5 @@ RUN bundle install
 COPY . .
 
 EXPOSE 3000
+ENTRYPOINT ["bash", "bin/docker-entrypoint-dev"]
 CMD ["bin/rails", "server", "-b", "0.0.0.0"]

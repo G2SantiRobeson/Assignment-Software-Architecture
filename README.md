@@ -59,7 +59,7 @@ docker compose run --rm web bin/rails db:seed
 docker compose up
 ```
 
-The seed step is optional. After the first setup, `docker compose up` starts PostgreSQL and Rails and publishes Rails on [http://localhost:3000](http://localhost:3000). Stop the services with `docker compose down`. The named `postgres_data` volume preserves database data; do not add `--volumes` unless deleting that data is intended.
+The seed step is optional. After the first setup, `docker compose up` starts PostgreSQL and Rails and publishes Rails on [http://localhost:3000](http://localhost:3000). The development entrypoint removes a stale Puma PID left by an interrupted container and runs `db:prepare`, so new databases and pending migrations are handled automatically on startup. Stop the services with `docker compose down`. The named `postgres_data` volume preserves database data; do not add `--volumes` unless deleting that data is intended.
 
 To prepare the Docker test database and run the suite:
 
