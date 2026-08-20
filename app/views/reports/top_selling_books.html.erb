@@ -1,0 +1,5 @@
+<% content_for :title, "Top selling books" %><h1>Top 50 selling books of all time</h1><p class="muted">The publication-year flag uses yearly sales and deterministic row-number ranking, so exactly five books qualify in a year when at least five have sales.</p>
+<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Book</th><th>Author</th><th>Book sales</th><th>Author sales</th><th>Top 5 in publication year?</th></tr></thead><tbody>
+  <% @books.each_with_index do |book, index| %><tr><td><%= index + 1 %></td><td><%= link_to book.name, book_path(book.id) %></td><td><%= link_to book.author_name, author_path(book.author_id) %></td><td><%= number_with_delimiter(book.total_sales.to_i) %></td><td><%= number_with_delimiter(book.author_total_sales.to_i) %></td><td><% if ActiveModel::Type::Boolean.new.cast(book.top_five_in_publication_year) %><span class="yes">Yes</span><% else %><span class="no">No</span><% end %></td></tr><% end %>
+  <% if @books.empty? %><tr><td colspan="6" class="empty">No sales data is available.</td></tr><% end %>
+</tbody></table></div>

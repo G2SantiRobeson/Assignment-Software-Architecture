@@ -1,0 +1,28 @@
+<% content_for :title, @author.name %>
+<div class="page-header">
+  <h1><%= @author.name %></h1>
+  <div class="actions">
+    <%= link_to "Edit", edit_author_path(@author), class: "button secondary" %>
+    <%= button_to "Delete", @author, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this author?" } } %>
+  </div>
+</div>
+<div class="card">
+  <dl class="details">
+    <dt>Date of birth</dt><dd><%= @author.date_of_birth&.to_fs(:long) || "Not recorded" %></dd>
+    <dt>Country of origin</dt><dd><%= @author.country_of_origin.presence || "Not recorded" %></dd>
+    <dt>Description</dt><dd><%= @author.short_description.presence || "No description." %></dd>
+  </dl>
+</div>
+
+<h2>Books</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Book</th><th>Publication date</th><th>Lifetime sales</th></tr></thead>
+    <tbody>
+      <% @books.each do |book| %>
+        <tr><td><%= link_to book.name, book %></td><td><%= book.date_of_publication.to_fs(:long) %></td><td><%= number_with_delimiter(book.number_of_sales) %></td></tr>
+      <% end %>
+      <% if @books.empty? %><tr><td colspan="3" class="empty">This author has no books.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>

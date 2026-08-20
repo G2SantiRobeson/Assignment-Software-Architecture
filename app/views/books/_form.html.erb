@@ -1,0 +1,24 @@
+<%= form_with model: book do |form| %>
+  <%= render "shared/form_errors", record: book %>
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true, autofocus: true %>
+  </div>
+  <div class="field">
+    <%= form.label :author_id, "Author" %>
+    <%= form.collection_select :author_id, @authors, :id, :name, { prompt: "Select an author" }, required: true %>
+  </div>
+  <div class="field">
+    <%= form.label :date_of_publication %>
+    <%= form.date_field :date_of_publication, required: true %>
+  </div>
+  <div class="field">
+    <%= form.label :summary %>
+    <%= form.text_area :summary %>
+  </div>
+  <p class="field-hint">Lifetime sales are calculated automatically from yearly sale records.</p>
+  <div class="actions">
+    <%= form.submit %>
+    <%= link_to "Cancel", book.persisted? ? book_path(book) : books_path, class: "button secondary" %>
+  </div>
+<% end %>

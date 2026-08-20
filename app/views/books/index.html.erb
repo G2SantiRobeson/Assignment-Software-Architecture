@@ -1,0 +1,22 @@
+<% content_for :title, "Books" %>
+<div class="page-header">
+  <h1>Books</h1>
+  <%= link_to "New book", new_book_path, class: "button" %>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Book</th><th>Author</th><th>Publication date</th><th>Lifetime sales</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% @books.each do |book| %>
+        <tr>
+          <td><%= link_to book.name, book %></td>
+          <td><%= link_to book.author.name, book.author %></td>
+          <td><%= book.date_of_publication.to_fs(:long) %></td>
+          <td><%= number_with_delimiter(book.number_of_sales) %></td>
+          <td><div class="actions"><%= link_to "Edit", edit_book_path(book) %><%= button_to "Delete", book, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this book?" } } %></div></td>
+        </tr>
+      <% end %>
+      <% if @books.empty? %><tr><td colspan="5" class="empty">No books have been added.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>
