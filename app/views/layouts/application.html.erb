@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Book Review Catalog" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <%= link_to "Book Review Catalog", root_path, class: "brand" %>
+        <nav aria-label="Main navigation">
+          <%= link_to "Authors", authors_path %>
+          <%= link_to "Books", books_path %>
+          <%= link_to "Reviews", reviews_path %>
+          <%= link_to "Sales", sales_path %>
+          <%= link_to "Author statistics", author_statistics_path %>
+          <%= link_to "Top rated", top_rated_books_path %>
+          <%= link_to "Top selling", top_selling_books_path %>
+          <%= link_to "Search", book_search_path %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <% flash.each do |type, message| %>
+        <div class="flash <%= type %>" role="status"><%= message %></div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

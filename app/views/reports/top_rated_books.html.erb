@@ -1,0 +1,5 @@
+<% content_for :title, "Top rated books" %><h1>Top 10 rated books of all time</h1><p class="muted">Ranked by average score, then review count, book name, and record ID.</p>
+<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Book</th><th>Author</th><th>Average</th><th>Highest-rated review</th><th>Lowest-rated review</th></tr></thead><tbody>
+  <% @books.each_with_index do |book, index| %><tr><td><%= index + 1 %></td><td><%= link_to book.name, book_path(book.id) %></td><td><%= link_to book.author_name, author_path(book.author_id) %></td><td><%= number_with_precision(book.average_score, precision: 2) %> <span class="muted">(<%= pluralize(book.review_count, "review") %>)</span></td><td><strong><%= book.highest_review_score %>/5</strong><br><span class="review-copy"><%= book.highest_rated_review %></span></td><td><strong><%= book.lowest_review_score %>/5</strong><br><span class="review-copy"><%= book.lowest_rated_review %></span></td></tr><% end %>
+  <% if @books.empty? %><tr><td colspan="6" class="empty">No reviewed books are available.</td></tr><% end %>
+</tbody></table></div>

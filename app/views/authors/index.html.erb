@@ -1,0 +1,22 @@
+<% content_for :title, "Authors" %>
+<div class="page-header">
+  <h1>Authors</h1>
+  <%= link_to "New author", new_author_path, class: "button" %>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>Date of birth</th><th>Country of origin</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% @authors.each do |author| %>
+        <tr>
+          <td><%= link_to author.name, author %></td>
+          <td><%= author.date_of_birth&.to_fs(:long) || "Not recorded" %></td>
+          <td><%= author.country_of_origin.presence || "Not recorded" %></td>
+          <td><div class="actions"><%= link_to "Edit", edit_author_path(author) %><%= button_to "Delete", author, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this author?" } } %></div></td>
+        </tr>
+      <% end %>
+      <% if @authors.empty? %><tr><td colspan="4" class="empty">No authors have been added.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>

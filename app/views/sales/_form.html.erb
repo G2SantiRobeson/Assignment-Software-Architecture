@@ -1,0 +1,7 @@
+<%= form_with model: sale do |form| %>
+  <%= render "shared/form_errors", record: sale %>
+  <div class="field"><%= form.label :book_id, "Book" %><%= form.collection_select :book_id, @books, :id, ->(book) { "#{book.name} — #{book.author.name}" }, { prompt: "Select a book" }, required: true %></div>
+  <div class="field"><%= form.label :year %><%= form.number_field :year, min: 1, max: 9999, step: 1, required: true %></div>
+  <div class="field"><%= form.label :sales %><%= form.number_field :sales, min: 0, step: 1, required: true %></div>
+  <div class="actions"><%= form.submit %><%= link_to "Cancel", sale.persisted? ? sale_path(sale) : sales_path, class: "button secondary" %></div>
+<% end %>

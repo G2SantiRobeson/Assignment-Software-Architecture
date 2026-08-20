@@ -1,0 +1,12 @@
+<% content_for :title, "Book summary search" %><h1>Book summary search</h1><p class="muted">A book matches when its summary contains any entered word, ignoring case.</p>
+<%= form_with url: book_search_path, method: :get, class: "card" do |form| %><div class="field"><%= form.label :q, "Words to find" %><%= form.text_field :q, value: @query, placeholder: "artificial intelligence systems", autofocus: true %></div><%= form.submit "Search summaries" %><% end %>
+<% if @query.present? %>
+  <p><%= pluralize(@results.total_count, "matching book") %></p>
+  <div class="table-wrap"><table><thead><tr><th>Book</th><th>Author</th><th>Publication date</th><th>Summary</th></tr></thead><tbody>
+    <% @results.records.each do |book| %><tr><td><%= link_to book.name, book %></td><td><%= link_to book.author.name, book.author %></td><td><%= book.date_of_publication.to_fs(:long) %></td><td class="review-copy"><%= truncate(book.summary, length: 220) %></td></tr><% end %>
+    <% if @results.records.empty? %><tr><td colspan="4" class="empty">No summaries matched the supplied words.</td></tr><% end %>
+  </tbody></table></div>
+  <% if @results.total_pages > 1 %><nav class="pagination" aria-label="Search result pages"><% if @results.prev_page %><%= link_to "← Previous", book_search_path(@results.params_for_page(@results.prev_page)), class: "button secondary" %><% end %><span>Page <%= @results.current_page %> of <%= @results.total_pages %></span><% if @results.next_page %><%= link_to "Next →", book_search_path(@results.params_for_page(@results.next_page)), class: "button secondary" %><% end %></nav><% end %>
+<% else %>
+  <p class="empty">Enter one or more words to search book summaries.</p>
+<% end %>

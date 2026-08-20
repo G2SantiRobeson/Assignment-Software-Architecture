@@ -1,0 +1,5 @@
+<% content_for :title, "Yearly sales" %><div class="page-header"><h1>Yearly sales</h1><%= link_to "New yearly sale", new_sale_path, class: "button" %></div>
+<div class="table-wrap"><table><thead><tr><th>Book</th><th>Year</th><th>Sales</th><th>Actions</th></tr></thead><tbody>
+  <% @sales.each do |sale| %><tr><td><%= link_to sale.book.name, sale.book %><br><span class="muted"><%= sale.book.author.name %></span></td><td><%= link_to sale.year, sale %></td><td><%= number_with_delimiter(sale.sales) %></td><td><div class="actions"><%= link_to "Edit", edit_sale_path(sale) %><%= button_to "Delete", sale, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this sale?" } } %></div></td></tr><% end %>
+  <% if @sales.empty? %><tr><td colspan="4" class="empty">No yearly sales have been added.</td></tr><% end %>
+</tbody></table></div>

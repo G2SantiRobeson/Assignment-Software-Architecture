@@ -1,0 +1,26 @@
+<% content_for :title, @book.name %>
+<div class="page-header">
+  <h1><%= @book.name %></h1>
+  <div class="actions">
+    <%= link_to "Edit", edit_book_path(@book), class: "button secondary" %>
+    <%= button_to "Delete", @book, method: :delete, class: "danger", form: { data: { turbo_confirm: "Delete this book?" } } %>
+  </div>
+</div>
+<div class="card">
+  <dl class="details">
+    <dt>Author</dt><dd><%= link_to @book.author.name, @book.author %></dd>
+    <dt>Publication date</dt><dd><%= @book.date_of_publication.to_fs(:long) %></dd>
+    <dt>Lifetime sales</dt><dd><%= number_with_delimiter(@book.number_of_sales) %></dd>
+    <dt>Summary</dt><dd><%= @book.summary.presence || "No summary." %></dd>
+  </dl>
+</div>
+<div class="page-header"><h2>Reviews</h2><%= link_to "Add review", new_review_path(book_id: @book.id), class: "button" %></div>
+<div class="table-wrap"><table><thead><tr><th>Score</th><th>Review</th><th>Up-votes</th></tr></thead><tbody>
+  <% @reviews.each do |review| %><tr><td><%= review.score %>/5</td><td><%= link_to truncate(review.review_text, length: 120), review %></td><td><%= review.up_votes %></td></tr><% end %>
+  <% if @reviews.empty? %><tr><td colspan="3" class="empty">No reviews yet.</td></tr><% end %>
+</tbody></table></div>
+<div class="page-header"><h2>Yearly sales</h2><%= link_to "Add yearly sale", new_sale_path(book_id: @book.id), class: "button" %></div>
+<div class="table-wrap"><table><thead><tr><th>Year</th><th>Sales</th></tr></thead><tbody>
+  <% @sales.each do |sale| %><tr><td><%= link_to sale.year, sale %></td><td><%= number_with_delimiter(sale.sales) %></td></tr><% end %>
+  <% if @sales.empty? %><tr><td colspan="2" class="empty">No yearly sales yet.</td></tr><% end %>
+</tbody></table></div>
