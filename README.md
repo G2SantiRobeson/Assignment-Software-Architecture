@@ -157,5 +157,3 @@ All CRUD resources use standard Rails REST actions for `index`, `show`, `new`, `
 
 - `docs/architecture_decisions.md` records implementation decisions and trade-offs.
 - `docs/development_log.md` records objective commands, errors, fixes, and verification facts.
-
-Neither document is a substitute for the student-authored assignment report.
