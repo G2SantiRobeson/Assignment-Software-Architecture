@@ -2,6 +2,8 @@
 
 This repository contains the coded portion of a server-rendered book-review assignment. It provides CRUD pages for authors, books, reviews, and yearly sales; database-backed reports; summary search; and a reproducible seed-data pipeline. This README and the files under `docs/` are technical implementation records, not the students' final report.
 
+The complete container-orchestration guide for the second delivery is in [`README_DELIVERY_2.md`](README_DELIVERY_2.md). It covers Docker Compose, Kubernetes (Minikube/k3d), the assigned HashiCorp Nomad deployment, persistent state, scaling, and the required verification procedures.
+
 ## Required software
 
 - Ruby 3.3.8 (pinned by `.ruby-version`)
