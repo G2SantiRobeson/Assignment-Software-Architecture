@@ -26,7 +26,7 @@ Rails.application.configure do
   config.assume_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("RAILS_ASSUME_SSL", "true"))
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # HTTPS remains the secure default; local Kubernetes/Nomad manifests opt out explicitly.
+  # HTTPS remains the secure default; local Kubernetes manifests opt out explicitly.
   config.force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("RAILS_FORCE_SSL", "true"))
 
   # Skip http-to-https redirect for the default health check endpoint.

@@ -1,301 +1,333 @@
-# Segunda entrega: Docker, Kubernetes y HashiCorp Nomad
+# Entrega 2: Docker Compose y Kubernetes
 
-Este documento describe la infraestructura añadida para la segunda entrega, cómo ejecutarla y cómo demostrar cada requisito. La aplicación funcional (modelos, CRUD, reportes, búsqueda y semillas) no fue modificada. La configuración existente de Docker Compose se conservó porque ya separaba correctamente Rails y PostgreSQL y persistía la base de datos.
+Esta guía describe la infraestructura de la segunda entrega. La aplicación usa
+Ruby on Rails 8.0.5.1, Ruby 3.3.8 y PostgreSQL 16. Docker Compose permite
+ejecutarla localmente y los manifiestos de `k8s/` permiten desplegar la misma
+imagen en un clúster Kubernetes local con Minikube o k3d.
 
-## 1. Resumen de lo implementado
+## 1. Arquitectura
 
-La entrega dispone de tres formas de ejecución:
+Docker Compose:
 
-1. **Docker Compose:** un contenedor `web` para Rails y otro `db` para PostgreSQL. `docker compose up --build` construye y levanta todo el sistema.
-2. **Kubernetes local:** manifiestos bajo `k8s/` para Minikube o k3d. Incluyen Deployments, Services, ConfigMap, Secret y un PersistentVolumeClaim.
-3. **HashiCorp Nomad:** el archivo `nomad/book-reviews.nomad.hcl` ejecuta Rails y PostgreSQL como tareas Docker separadas. Usa service discovery nativo de Nomad, Nomad Variables para los secretos y un host volume para PostgreSQL.
+```text
+Browser -> localhost:3000 -> Rails (web) -> db:5432 -> PostgreSQL
+                                                   -> named volume postgres_data
+```
 
-También se hizo configurable el HTTPS de producción mediante `RAILS_FORCE_SSL` y `RAILS_ASSUME_SSL`. Ambos continúan activados por defecto. Los despliegues locales los desactivan explícitamente porque exponen HTTP y no incluyen un proxy TLS.
+Kubernetes:
+
+```text
+Browser
+   |
+   v
+Service book-reviews-web (NodePort 30080)
+   |
+   v
+Deployment book-reviews-web
+   |
+   v
+Service book-reviews-postgres (ClusterIP)
+   |
+   v
+Deployment book-reviews-postgres
+   |
+   v
+PersistentVolumeClaim book-reviews-postgres-data
+```
+
+Rails y PostgreSQL se ejecutan siempre en contenedores separados.
 
 ## 2. Archivos de infraestructura
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| `Dockerfile.dev` | Imagen Ruby/Rails usada por Docker Compose. |
-| `Dockerfile` | Imagen de producción, multi-stage y con usuario no privilegiado, usada por Kubernetes y Nomad. |
-| `compose.yaml` | Orquesta Rails y PostgreSQL, espera el health check de la base y crea el volumen `postgres_data`. |
-| `bin/docker-entrypoint-dev` | Elimina un PID antiguo, ejecuta `db:prepare` y luego inicia Rails. |
-| `k8s/namespace.yaml` | Aísla todos los recursos en el namespace `book-reviews`. |
-| `k8s/configmap.yaml` | Configuración no sensible de Rails y de la conexión PostgreSQL. |
-| `k8s/secret.yaml` | Credenciales locales de PostgreSQL y secreto compartido de Rails. |
-| `k8s/postgres-pvc.yaml` | Solicita 2 GiB persistentes para PostgreSQL. |
-| `k8s/postgres-deployment.yaml` | Ejecuta una réplica de PostgreSQL y monta el PVC. |
-| `k8s/postgres-service.yaml` | Proporciona el nombre DNS interno `book-reviews-postgres`. |
-| `k8s/app-deployment.yaml` | Ejecuta Rails con probes de inicio, disponibilidad y vida. |
-| `k8s/app-service.yaml` | Expone Rails mediante un NodePort en el puerto `30080`. |
-| `k8s/kustomization.yaml` | Permite aplicar todos los manifiestos con un solo comando. |
-| `nomad/agent.hcl` | Registra el host volume local de PostgreSQL en un cliente Nomad. |
-| `nomad/book-reviews.nomad.hcl` | Job completo con los grupos `database` y `web`. |
+| `Dockerfile` | Imagen Rails de producción, multistage y con usuario sin privilegios. |
+| `Dockerfile.dev` | Imagen Rails de desarrollo utilizada por Compose. |
+| `compose.yaml` | Servicios `web` y `db`, healthcheck y volumen PostgreSQL. |
+| `.env.example` | Plantilla de variables locales para Compose. |
+| `k8s/namespace.yaml` | Namespace `book-reviews`. |
+| `k8s/configmap.yaml` | Configuración no sensible de Rails y PostgreSQL. |
+| `k8s/secret.yaml` | Credenciales locales de demostración y secreto de Rails. |
+| `k8s/postgres-pvc.yaml` | Solicitud de 2 GiB de almacenamiento persistente. |
+| `k8s/postgres-deployment.yaml` | Deployment PostgreSQL con el PVC montado. |
+| `k8s/postgres-service.yaml` | DNS interno estable para PostgreSQL. |
+| `k8s/app-deployment.yaml` | Deployment Rails, init container y probes. |
+| `k8s/app-service.yaml` | Service NodePort para exponer Rails. |
+| `k8s/kustomization.yaml` | Agrupa todos los manifiestos. |
+
+Los entrypoints ejecutan `rails db:prepare` antes de iniciar Rails. En
+Compose se usa el entorno development; Kubernetes utiliza production.
 
 ## 3. Docker Compose
 
-### Ejecución
+### Configuración
 
-Requisito: Docker Desktop iniciado. Desde la raíz del repositorio:
+Desde PowerShell, copiar la plantilla y reemplazar la contraseña local:
 
-```text
-docker compose up --build
+```powershell
+Copy-Item .env.example .env
+notepad .env
 ```
 
-La aplicación queda disponible en <http://localhost:3000>. No es necesario ejecutar `db:create` ni `db:migrate` por separado: el entrypoint ejecuta `bin/rails db:prepare` en cada arranque y el servicio web espera que el health check `pg_isready` de PostgreSQL sea exitoso.
+`.env` está ignorado por Git. No se deben guardar credenciales reales en
+`.env.example`.
 
-La carga de datos mock es opcional y reinicia el conjunto de datos de la entrega:
+### Inicio
 
-```text
-docker compose exec web bin/rails db:seed
+```powershell
+docker compose config --quiet
+docker compose up --build -d
 ```
 
-Para detener los contenedores sin borrar la base:
+El comando levanta todo el sistema. Rails queda disponible en
+<http://localhost:3000>.
 
-```text
+```powershell
+docker compose ps
+docker compose logs --tail 100 db
+docker compose logs --tail 100 web
+Invoke-WebRequest http://localhost:3000/up -UseBasicParsing
+```
+
+Rails usa `DB_HOST=db`, donde `db` es el nombre DNS del servicio Compose.
+El healthcheck de PostgreSQL usa `pg_isready` y Rails no comienza hasta que
+la base esté saludable. `OPEN_LIBRARY_ENABLED=false` hace que un primer
+arranque sea reproducible sin depender de la API externa.
+
+Para reconstruir explícitamente el dataset de la tarea:
+
+```powershell
+docker compose exec -e OPEN_LIBRARY_ENABLED=false web bin/rails db:seed
+```
+
+El seed elimina y vuelve a crear los registros de autores, libros, reviews y
+ventas; debe ejecutarse solamente cuando se quiera reiniciar ese dataset.
+
+### Persistencia de Compose
+
+PostgreSQL monta `postgres_data` en `/var/lib/postgresql/data`.
+
+```powershell
+docker compose config --volumes
+docker volume ls
+```
+
+Prueba de persistencia:
+
+1. Crear un libro llamado `COMPOSE_PERSISTENCE_MARKER`.
+2. Confirmar que aparece en la aplicación.
+3. Reemplazar los contenedores:
+
+```powershell
 docker compose down
+docker compose up -d
 ```
 
-No usar `docker compose down --volumes` si se necesita conservar la información, porque esa opción elimina el volumen de PostgreSQL.
+4. Confirmar que el libro todavía existe.
 
-### Estado persistente en Docker
+No usar `docker compose down -v` durante esta prueba porque `-v` elimina
+intencionalmente el volumen.
 
-- **Base de datos:** vive en el volumen nombrado `postgres_data`, montado en `/var/lib/postgresql/data` dentro del contenedor PostgreSQL. Sobrevive a la eliminación o recreación de los contenedores.
-- **Archivos subidos:** la aplicación no carga Active Storage (`active_storage/engine` está deshabilitado), por lo que actualmente no existen uploads que deban persistirse.
-- **Sesiones:** Rails usa sesiones de cookie firmadas del lado del cliente; no hay un almacén de sesiones local en el contenedor.
-- **Código y temporales en Compose:** el código se monta desde el directorio del host para desarrollo. Los logs y archivos temporales no son estado de negocio.
+## 4. Kubernetes local
 
-## 4. Despliegue local en Kubernetes
+Se puede usar Minikube o k3d. Los ejemplos siguientes utilizan Minikube con el
+driver Docker.
 
-### Recursos y decisiones
+### Requisitos
 
-- Rails y PostgreSQL tienen Deployments separados.
-- `book-reviews-web` es el Service externo de la aplicación.
-- `book-reviews-postgres` es un Service `ClusterIP`, accesible solo dentro del clúster.
-- El hostname de base de datos se obtiene desde el ConfigMap; usuario, contraseña y `SECRET_KEY_BASE` provienen del Secret.
-- El PVC tiene modo `ReadWriteOnce`. PostgreSQL usa una sola réplica y estrategia `Recreate` para no montar simultáneamente un volumen local de escritura en dos pods.
-- Rails comienza con una réplica. Luego del primer arranque puede escalarse porque los pods web no almacenan estado de negocio local.
-- Un init container ejecuta `pg_isready` y evita que Rails intente preparar la base antes de que PostgreSQL esté disponible.
-- Los probes consultan `/up`. Kubernetes solo envía tráfico a pods web disponibles y reinicia un contenedor si falla repetidamente.
+```powershell
+docker version
+minikube version
+kubectl version --client
+```
 
-`k8s/secret.yaml` contiene valores exclusivamente locales para que la entrega sea reproducible. Un Secret de Kubernetes evita introducir credenciales en la imagen, pero un valor guardado en Git no constituye un secreto de producción. Antes de un despliegue real se debe reemplazar ese manifiesto por un gestor de secretos o por un Secret creado fuera del repositorio.
+Iniciar el clúster:
 
-### Opción A: Minikube
+```powershell
+minikube start --driver=docker --cpus=4 --memory=6144
+kubectl get nodes
+```
 
-```text
-minikube start --driver=docker
+El nodo debe aparecer como `Ready`.
+
+### Construcción de la imagen
+
+La imagen debe estar disponible dentro del runtime de Minikube:
+
+```powershell
 minikube image build -t book-reviews:local .
+minikube image ls | Select-String book-reviews
+```
+
+No se utiliza el flag `--no-cache` porque no está disponible en todas las
+versiones de `minikube image build`. Si se necesita invalidar capas, primero
+puede borrarse la imagen local del clúster o utilizarse un tag nuevo.
+
+### Configuración y secretos
+
+`k8s/configmap.yaml` contiene solamente configuración no sensible:
+
+- `RAILS_ENV=production`.
+- hostname interno `book-reviews-postgres`.
+- puerto PostgreSQL 5432.
+- configuración HTTP local.
+
+`k8s/secret.yaml` contiene valores exclusivamente locales para que la entrega
+sea reproducible. Los Secrets separan las credenciales de la imagen, pero un
+valor guardado en Git no es un secreto de producción. Antes de un despliegue
+real debe sustituirse por un Secret creado fuera del repositorio o por un
+gestor de secretos.
+
+### Despliegue
+
+Validar el render de Kustomize y aplicar:
+
+```powershell
+kubectl kustomize k8s
 kubectl apply -k k8s
+```
+
+Esperar los Deployments:
+
+```powershell
 kubectl -n book-reviews rollout status deployment/book-reviews-postgres --timeout=5m
 kubectl -n book-reviews rollout status deployment/book-reviews-web --timeout=5m
+kubectl get pods,services,pvc -n book-reviews
+```
+
+Estado esperado:
+
+- Los pods PostgreSQL y Rails aparecen `Running` y `1/1 Ready`.
+- El PVC `book-reviews-postgres-data` aparece `Bound`.
+- El Service web publica `80:30080/TCP`.
+
+Si Rails muestra `0/1 Running`, todavía puede estar ejecutando
+`db:prepare`. Revisar eventos y logs antes de asumir que falló:
+
+```powershell
+kubectl -n book-reviews describe pod -l app.kubernetes.io/component=web
+kubectl -n book-reviews logs deployment/book-reviews-web -c rails
+kubectl -n book-reviews logs deployment/book-reviews-web -c wait-for-postgres
+```
+
+## 5. Acceso a la aplicación
+
+Obtener la URL administrada por Minikube:
+
+```powershell
 minikube service book-reviews-web -n book-reviews --url
 ```
 
-El último comando imprime la URL accesible de la aplicación.
+Mantener ese comando activo si el driver necesita un túnel. También puede
+utilizarse port-forward:
 
-### Opción B: k3d
-
-```text
-k3d cluster create book-reviews --agents 1 -p "30080:30080@server:0"
-docker build -t book-reviews:local .
-k3d image import book-reviews:local -c book-reviews
-kubectl apply -k k8s
-kubectl -n book-reviews rollout status deployment/book-reviews-postgres --timeout=5m
-kubectl -n book-reviews rollout status deployment/book-reviews-web --timeout=5m
-```
-
-La aplicación queda disponible en <http://localhost:30080>.
-
-### Poblar la base en Kubernetes
-
-El contenedor prepara automáticamente las bases y migraciones. Para crear los datos mock requeridos:
-
-```text
-kubectl -n book-reviews exec deployment/book-reviews-web -- env OPEN_LIBRARY_ENABLED=false ./bin/rails db:seed
-```
-
-El seed es destructivo para los registros existentes y solo debe ejecutarse cuando se desea reconstruir el dataset.
-
-### Verificación exigida por el enunciado
-
-#### A. La aplicación es accesible mediante su Service
-
-```text
-kubectl -n book-reviews get service book-reviews-web
-kubectl -n book-reviews get endpoints book-reviews-web
+```powershell
 kubectl -n book-reviews port-forward service/book-reviews-web 8080:80
 ```
 
-Con `port-forward` activo, abrir <http://localhost:8080/up> y <http://localhost:8080>. El endpoint `/up` debe responder exitosamente y el Service debe tener al menos un endpoint.
+Con el port-forward activo:
 
-#### B. Kubernetes recrea un pod de la aplicación
-
-```text
-kubectl -n book-reviews get pods -l app.kubernetes.io/component=web
-kubectl -n book-reviews delete pod -l app.kubernetes.io/component=web
-kubectl -n book-reviews rollout status deployment/book-reviews-web --timeout=5m
-kubectl -n book-reviews get pods -l app.kubernetes.io/component=web
+```powershell
+Invoke-WebRequest http://localhost:8080/up -UseBasicParsing
 ```
 
-El nombre o la edad del pod cambia porque el Deployment mantiene la cantidad deseada de réplicas.
+El endpoint debe responder HTTP 200.
 
-#### C. Los datos sobreviven al reinicio de PostgreSQL
+## 6. Recuperación automática
 
-Primero guardar un dato mediante la interfaz o ejecutar el seed. Registrar el conteo:
+Obtener el nombre del pod Rails:
 
-```text
-kubectl -n book-reviews exec deployment/book-reviews-web -- ./bin/rails runner "puts Author.count"
-kubectl -n book-reviews get pvc book-reviews-postgres-data
-kubectl -n book-reviews delete pod -l app.kubernetes.io/component=database
-kubectl -n book-reviews rollout status deployment/book-reviews-postgres --timeout=5m
-kubectl -n book-reviews exec deployment/book-reviews-web -- ./bin/rails runner "puts Author.count"
+```powershell
+kubectl get pods -n book-reviews -l app.kubernetes.io/component=web
 ```
 
-El PVC debe continuar en estado `Bound` y el conteo anterior y posterior debe ser igual. El pod se reemplaza, pero el volumen no se elimina.
+Eliminarlo y observar el reemplazo:
 
-### Escalar la aplicación web
+```powershell
+kubectl delete pod -n book-reviews -l app.kubernetes.io/component=web
+kubectl get pods -n book-reviews -l app.kubernetes.io/component=web -w
+```
 
-Después del primer arranque:
+El Deployment conserva `replicas: 1`, por lo que Kubernetes crea un pod
+nuevo. El nombre/UID debe cambiar y el reemplazo debe volver a `1/1 Ready`.
+Después se debe comprobar nuevamente `/up`.
 
-```text
+## 7. Persistencia de PostgreSQL en Kubernetes
+
+El Deployment PostgreSQL monta el PVC
+`book-reviews-postgres-data` en `/var/lib/postgresql/data`. La estrategia
+`Recreate` evita que dos pods intenten montar simultáneamente el volumen
+`ReadWriteOnce`.
+
+Prueba:
+
+1. Crear un libro llamado `KUBERNETES_PERSISTENCE_MARKER`.
+2. Registrar el nombre del pod PostgreSQL actual:
+
+```powershell
+kubectl get pods -n book-reviews -l app.kubernetes.io/component=database
+```
+
+3. Eliminar el pod:
+
+```powershell
+kubectl delete pod -n book-reviews -l app.kubernetes.io/component=database
+kubectl get pods -n book-reviews -l app.kubernetes.io/component=database -w
+```
+
+4. Esperar que el reemplazo esté `1/1 Ready`.
+5. Verificar que `KUBERNETES_PERSISTENCE_MARKER` todavía existe.
+
+No eliminar el PVC durante la prueba. El objetivo es reemplazar el pod y
+volver a montar el mismo volumen.
+
+## 8. Estado persistente y múltiples instancias
+
+| Estado | Ubicación actual | Persistente | Estrategia con varias réplicas |
+| --- | --- | --- | --- |
+| Datos de negocio | PostgreSQL | Sí | Todas las réplicas Rails comparten el mismo Service PostgreSQL. |
+| Sesiones | Cookie cifrada/firmada del cliente | Fuera del contenedor | Todas las réplicas comparten `SECRET_KEY_BASE`. |
+| Uploads | No aplicable; Active Storage está deshabilitado | No aplicable | Si se agrega, usar S3, MinIO u object storage compartido. |
+| Cache | Memoria del proceso Rails | No | Usar Redis si se necesita coherencia entre réplicas. |
+| Logs y temporales | STDOUT/filesystem del contenedor | No | Centralizar logs en un entorno real. |
+
+Rails no conserva estado de negocio en su filesystem. Por eso eliminar un pod
+web no pierde datos importantes. Para probar más de una réplica después de que
+la base esté preparada:
+
+```powershell
 kubectl -n book-reviews scale deployment/book-reviews-web --replicas=2
 kubectl -n book-reviews rollout status deployment/book-reviews-web --timeout=5m
-kubectl -n book-reviews get pods -l app.kubernetes.io/component=web
+kubectl get pods -n book-reviews -l app.kubernetes.io/component=web
 ```
 
-Las réplicas comparten PostgreSQL mediante el Service interno y reciben el mismo `SECRET_KEY_BASE`, por lo que pueden validar las mismas cookies firmadas. El Service web distribuye solicitudes entre los pods disponibles. La capacidad de conexiones debe calcularse aproximadamente como `réplicas × RAILS_MAX_THREADS`, además de conexiones administrativas y otros procesos.
+El Service distribuye tráfico entre los pods disponibles. Restaurar el valor
+de entrega:
 
-## 5. Despliegue asignado: HashiCorp Nomad
-
-HashiCorp recomienda usar Nomad desde WSL2 cuando Docker Desktop se ejecuta en Windows. El agente debe poder acceder al socket de Docker. Los siguientes comandos se ejecutan en una terminal Linux/WSL2 desde el repositorio.
-
-### Preparar el agente y la imagen
-
-```text
-sudo mkdir -p /opt/nomad/volumes/book-reviews-postgres
-sudo nomad agent -dev -bind=0.0.0.0 -config=nomad/agent.hcl
+```powershell
+kubectl -n book-reviews scale deployment/book-reviews-web --replicas=1
 ```
 
-Mantener el agente activo. En otra terminal:
+En un despliegue de mayor escala, las migraciones deberían ejecutarse una sola
+vez mediante un Job o una etapa de release antes de escalar Rails.
 
-```text
-export NOMAD_ADDR=http://127.0.0.1:4646
-docker build -t book-reviews:local .
-nomad node status
-```
+## 9. Limpieza y límites
 
-El nodo debe mostrar el driver `docker` disponible. El modo `-dev` es solo para evaluación local; un clúster real separaría servidores y clientes y habilitaría ACLs.
+Eliminar los recursos:
 
-### Registrar las credenciales con Nomad Variables
-
-```text
-nomad var put nomad/jobs/book-reviews \
-  DB_USERNAME=postgres \
-  DB_PASSWORD=book-reviews-local-password \
-  SECRET_KEY_BASE="$(openssl rand -hex 64)"
-```
-
-El job no contiene credenciales. Sus templates leen la variable `nomad/jobs/book-reviews` y generan archivos de entorno bajo el directorio privado `secrets/` de cada tarea. En un clúster real se deben habilitar ACLs; para requisitos más estrictos se puede integrar HashiCorp Vault.
-
-### Ejecutar y verificar el job
-
-```text
-nomad job plan nomad/book-reviews.nomad.hcl
-nomad job run nomad/book-reviews.nomad.hcl
-nomad job status book-reviews
-nomad service info book-reviews-postgres
-nomad service info book-reviews-web
-```
-
-La aplicación queda en <http://localhost:3000>. El grupo `database` publica PostgreSQL en el catálogo nativo de Nomad usando un puerto de host asignado dinámicamente, evitando conflictos con instalaciones locales de PostgreSQL. El template del grupo `web` utiliza `nomadService` para obtener ese puerto y reinicia Rails si cambia el endpoint. En Docker Desktop/WSL2, Rails alcanza el puerto publicado a través de `host.docker.internal`; usar el `127.0.0.1` anunciado por el agente apuntaría al propio contenedor Rails. El entorno Nomad también desactiva la consulta a Open Library durante el seed inicial para que el primer health check sea reproducible y no dependa de acceso externo.
-
-El health check TCP supervisa PostgreSQL y el health check HTTP consulta `/up` en Rails. Las políticas `restart` y `check_restart` permiten que Nomad reemplace tareas que fallen.
-
-### Persistencia y recuperación en Nomad
-
-Buscar los allocations:
-
-```text
-nomad job status book-reviews
-```
-
-Después de crear datos, reiniciar únicamente PostgreSQL usando el ID del allocation del grupo `database`:
-
-```text
-nomad alloc restart -task postgres <database-allocation-id>
-```
-
-Al volver a consultar la aplicación, los registros deben seguir presentes. El directorio `/opt/nomad/volumes/book-reviews-postgres` está fuera del allocation, por lo que sobrevive al reinicio de la tarea. Este host volume es adecuado para una demostración de un solo nodo, pero depende de ese nodo; en producción se usaría almacenamiento CSI o almacenamiento de red con copias de respaldo.
-
-## 6. Respuesta sobre estado y múltiples instancias
-
-El estado persistente actual vive en PostgreSQL. Docker Compose lo coloca en un named volume, Kubernetes en un PVC y Nomad en un host volume. La aplicación no implementa uploads y las sesiones están en cookies firmadas, de modo que los contenedores Rails son esencialmente stateless.
-
-Para ejecutar múltiples instancias web se mantiene una única base de datos compartida, un mismo secreto de firma y una capa de distribución de tráfico. Kubernetes ya proporciona esa distribución con el Service. No se debe copiar la base dentro de cada réplica. Si en el futuro se agregan uploads, deben moverse a almacenamiento compartido u object storage; si se cambian las sesiones a almacenamiento servidor, debe utilizarse un almacén compartido, por ejemplo Redis o PostgreSQL. Las migraciones deberían ejecutarse una vez mediante un Job o pipeline antes de ampliar a muchas réplicas.
-
-La base PostgreSQL del ejemplo sigue siendo una instancia única. Para alta disponibilidad real se necesitaría replicación administrada por un operador o un servicio PostgreSQL gestionado, además de copias de seguridad y un diseño de failover.
-
-## 7. Texto breve en inglés para el informe
-
-### Persistent state and multiple application instances
-
-> The application's durable business state is stored in PostgreSQL. Docker Compose stores the PostgreSQL data directory in the named `postgres_data` volume, Kubernetes mounts a PersistentVolumeClaim into the PostgreSQL pod, and the local Nomad deployment mounts a host volume outside the allocation. Therefore, replacing an application or database container does not remove the database files. The application does not currently enable Active Storage, so it has no persistent uploaded files. Rails uses signed client-side cookies for sessions, which means that session data is not stored in a specific application container.
->
-> To run multiple application instances, all Rails instances must connect to the same PostgreSQL service and use the same `SECRET_KEY_BASE` so that every instance can verify signed cookies. A Kubernetes Service distributes requests among healthy Rails pods. If file uploads are added later, they should be moved to shared or object storage. A server-side session implementation would also require a shared session store. Database connection limits must be sized for the number of replicas, and schema migrations should be executed once before scaling the application.
-
-### Kubernetes configuration
-
-> The Kubernetes deployment uses separate Deployments for Rails and PostgreSQL. A ClusterIP Service provides stable internal database discovery, while a NodePort Service exposes the web application. Non-sensitive values are supplied by a ConfigMap, and PostgreSQL credentials and the Rails secret key are supplied by a Secret instead of being embedded in the image. PostgreSQL mounts a ReadWriteOnce PersistentVolumeClaim, so its data survives pod replacement. Startup, readiness, and liveness probes monitor both containers. The Rails Deployment maintains the desired replica count and automatically creates a replacement when a web pod is deleted.
-
-### HashiCorp Nomad configuration
-
-> The assigned HashiCorp Nomad deployment defines separate `database` and `web` task groups using the Docker driver. PostgreSQL data is mounted from a Nomad host volume, while credentials are read from Nomad Variables through task templates. PostgreSQL and Rails are registered with Nomad's native service provider and monitored with TCP and HTTP health checks. The Rails template uses `nomadService` to discover the current PostgreSQL address. Restart policies recover failed tasks, while the external host volume preserves the database across allocation or task restarts.
-
-## 8. Limpieza
-
-Kubernetes:
-
-```text
+```powershell
 kubectl delete -k k8s
+minikube stop
 ```
 
-El comando elimina también el PVC y, dependiendo de la política del storage class local, puede borrar los datos asociados. Usarlo solamente al terminar la demostración.
+`kubectl delete -k k8s` elimina también el PVC y puede borrar sus datos. Debe
+usarse solamente cuando la demostración haya terminado y ya no se necesite la
+base.
 
-Nomad:
+Límites del entorno:
 
-```text
-nomad job stop book-reviews
-```
-
-Detener el job no elimina el directorio host de PostgreSQL. Su eliminación manual es destructiva y no es necesaria para volver a desplegar.
-
-## 9. Consideraciones fuera del alcance local
-
-- Los valores de `k8s/secret.yaml` son credenciales de demostración, no de producción.
-- El clúster de un solo nodo y el agente Nomad `-dev` no proporcionan alta disponibilidad.
-- El NodePort no incluye TLS ni un nombre de dominio; un entorno real usaría un Ingress o load balancer con certificados.
-- Los volúmenes protegen contra el reinicio de contenedores/pods, pero no reemplazan una estrategia de backups.
-- El seed puede depender de Open Library; `OPEN_LIBRARY_ENABLED=false` ofrece una ejecución local reproducible.
-
-## 10. Validaciones realizadas sobre los archivos
-
-Se ejecutaron las siguientes comprobaciones offline sobre el árbol final:
-
-- `docker compose config --quiet`: Compose válido, con servicios `db` y `web` y volumen `postgres_data`.
-- `kubectl kustomize k8s`: render exitoso de ocho recursos (Namespace, ConfigMap, Secret, PVC, dos Deployments y dos Services).
-- Nomad 2.0.4 `nomad fmt -check`: formato HCL válido para el job y la configuración del agente.
-- Nomad 2.0.4 `nomad job run -output`: parseo exitoso del job `book-reviews`, sus grupos `database`/`web`, las tareas Docker y el host volume.
-- `git diff --check` y revisión de espacios finales/codificación de los archivos nuevos.
-
-En el equipo donde se preparó esta entrega Docker Desktop no estaba iniciado y no estaban instalados Minikube, k3d ni Nomad como comandos permanentes. Por ello no se afirma una prueba viva de pods, allocations o persistencia. Las secuencias de las secciones 4 y 5 constituyen el procedimiento reproducible que debe ejecutarse con Docker y el clúster activos antes de presentar la demostración.
-
-## 11. Referencias oficiales
-
-- [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
-- [Kubernetes Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
-- [Kubernetes ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) y [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
-- [Nomad Docker task driver](https://developer.hashicorp.com/nomad/docs/deploy/task-driver/docker)
-- [Nomad service block](https://developer.hashicorp.com/nomad/docs/job-specification/service)
-- [Nomad host volumes](https://developer.hashicorp.com/nomad/docs/architecture/storage/host-volumes)
-- [Nomad Variables](https://developer.hashicorp.com/nomad/docs/concepts/variables)
-- [Nomad template functions for services and variables](https://developer.hashicorp.com/nomad/docs/job-specification/template)
+- Minikube es un clúster local y no proporciona alta disponibilidad real.
+- El PVC protege frente al reemplazo de pods, pero no sustituye backups.
+- NodePort no incluye TLS ni dominio.
+- PostgreSQL usa una sola réplica.
+- Las credenciales de `k8s/secret.yaml` son solamente valores de demostración.
