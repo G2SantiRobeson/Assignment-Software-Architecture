@@ -49,17 +49,19 @@ On systems that execute repository binstubs directly, the equivalent forms are `
 
 ## Docker setup
 
-The Compose configuration supplies the database host and development-only `postgres`/`postgres` credentials. Ruby gems are installed in the built `web` image, so rebuild it after changing `Gemfile` or `Gemfile.lock`. From the repository root:
+Copy the environment template, replace its example password, and start the complete system from the repository root. Ruby gems are installed in the built `web` image, so rebuild after changing `Gemfile` or `Gemfile.lock`.
 
-```text
-docker compose build
-docker compose run --rm web bin/rails db:create
-docker compose run --rm web bin/rails db:migrate
-docker compose run --rm web bin/rails db:seed
-docker compose up
+```powershell
+Copy-Item .env.example .env
+# Edit .env and replace POSTGRES_PASSWORD.
+docker compose up --build -d
+docker compose ps
+docker compose logs web db migrate
 ```
 
-The seed step is optional. After the first setup, `docker compose up` starts PostgreSQL and Rails and publishes Rails on [http://localhost:3000](http://localhost:3000). The development entrypoint removes a stale Puma PID left by an interrupted container and runs `db:prepare`, so new databases and pending migrations are handled automatically on startup. Stop the services with `docker compose down`. The named `postgres_data` volume preserves database data; do not add `--volumes` unless deleting that data is intended.
+On POSIX systems, use `cp .env.example .env`. A one-shot `migrate` service waits for PostgreSQL and runs `bin/rails db:prepare` before Rails starts, avoiding concurrent migrations when the web service is scaled. The application is published at [http://localhost:3000](http://localhost:3000); `/up` is its health endpoint. The first database preparation also loads the seed dataset and may take longer because the importer attempts to contact Open Library.
+
+Stop the services with `docker compose down`. The Compose project owns a named `postgres_data` volume, physically mounted at `/var/lib/postgresql/data` in the database container. `docker compose down` preserves it; do not add `--volumes` unless deleting the database is intentional. To verify persistence, create a recognizable row, run `docker compose down`, start the system again, and query the same row.
 
 To prepare the Docker test database and run the suite:
 
@@ -68,21 +70,96 @@ docker compose run --rm -e RAILS_ENV=test web bin/rails db:prepare
 docker compose run --rm -e RAILS_ENV=test web bin/rails test
 ```
 
+## HashiCorp Nomad deployment
+
+The `nomad/` directory is the Group 7 orchestrator deliverable. It uses a single native Linux Nomad server/client, Nomad-native service registration, Docker tasks, Nomad Variables for secrets, and a Docker named volume for the local PostgreSQL workload. No Consul, Vault, or Kubernetes installation is required. This setup is intentionally for a one-node academic environment: the Docker volume is node-local and must be replaced by CSI/shared storage before adding Nomad client nodes.
+
+Prerequisites are a native Linux host, Linux VM, or WSL2 distribution with its own Linux Docker Engine, Nomad 1.11.x, `curl`, and enough permission for the Nomad client and `/opt/nomad/data`. A Windows Nomad client cannot launch Linux Docker images, and running a Nomad client inside Docker is not a supported deployment. Stop any local service already using TCP port 5432, including this repository's Compose stack.
+
+Start the agent in its own terminal from the repository root:
+
+```bash
+sudo nomad agent -config=nomad/agent.hcl
+```
+
+In another terminal, verify that the node is ready and that the Docker driver is healthy:
+
+```bash
+export NOMAD_ADDR=http://127.0.0.1:4646
+nomad version
+nomad node status -verbose
+```
+
+Build the immutable Rails production image, generate runtime secrets, and store them in job-scoped Nomad Variables. The same generated values must be used in the commands below; they are never written to the repository or image.
+
+```bash
+docker build -t book-reviews:nomad .
+export BOOK_REVIEWS_DB_PASSWORD="$(openssl rand -base64 32)"
+export BOOK_REVIEWS_SECRET_KEY_BASE="$(openssl rand -hex 64)"
+nomad var put nomad/jobs/book-reviews-postgres postgres_password="$BOOK_REVIEWS_DB_PASSWORD"
+nomad var put nomad/jobs/book-reviews-migrate database_password="$BOOK_REVIEWS_DB_PASSWORD" secret_key_base="$BOOK_REVIEWS_SECRET_KEY_BASE"
+nomad var put nomad/jobs/book-reviews-web database_password="$BOOK_REVIEWS_DB_PASSWORD" secret_key_base="$BOOK_REVIEWS_SECRET_KEY_BASE"
+```
+
+Validate, plan, and deploy in dependency order. The batch migration must complete before the web job is submitted.
+
+```bash
+nomad job validate nomad/postgres.nomad.hcl
+nomad job validate nomad/migrate.nomad.hcl
+nomad job validate nomad/web.nomad.hcl
+nomad job plan nomad/postgres.nomad.hcl
+nomad job run nomad/postgres.nomad.hcl
+nomad job status book-reviews-postgres
+nomad job run nomad/migrate.nomad.hcl
+nomad job status book-reviews-migrate
+nomad job run nomad/web.nomad.hcl
+nomad job status book-reviews-web
+nomad service info book-reviews-web
+```
+
+`nomad service info` reports the allocated host address and dynamic port. Verify the exact reported endpoint with `curl http://<address>:<port>/up` and open `http://<address>:<port>/`. In WSL2, use the reported WSL address from Windows rather than assuming that its dynamic port is forwarded to `127.0.0.1`. The Nomad UI is available inside the Linux environment at [http://127.0.0.1:4646](http://127.0.0.1:4646).
+
+To test web self-healing, copy the running web allocation ID from `nomad job status book-reviews-web`, confirm the installed syntax with `nomad alloc stop -help`, and run `nomad alloc stop <web-allocation-id>`. A subsequent job status must show a healthy replacement allocation, and the replacement address returned by `nomad service info book-reviews-web` must answer `/up`.
+
+To test PostgreSQL persistence, create a recognizable record with `nomad alloc exec -task postgres <database-allocation-id> psql -U book_reviews -d book_reviews_production`, stop that allocation with `nomad alloc stop <database-allocation-id>`, wait for its replacement, and query the record through the replacement allocation. Do not remove the `book_reviews_nomad_postgres_data` Docker volume during this test.
+
+The web group uses a dynamic host port and may be scaled without a manifest redesign:
+
+```bash
+nomad job scale book-reviews-web 2
+nomad job status book-reviews-web
+nomad service info book-reviews-web
+```
+
+All Rails allocations share PostgreSQL and the same cookie-signing secret. This application has no uploaded-file subsystem; its in-process cache and Active Job queue are ephemeral, so a future feature that relies on cross-instance cache consistency or durable background jobs should use a shared service such as Redis or a database-backed queue.
+
+Stop and purge the jobs when finished. This does not delete the PostgreSQL Docker volume.
+
+```bash
+nomad job stop -purge book-reviews-web
+nomad job stop -purge book-reviews-migrate
+nomad job stop -purge book-reviews-postgres
+```
+
+Removing `book_reviews_nomad_postgres_data` with `docker volume rm` is a separate, destructive database reset. The committed `agent.hcl` has no ACL or transport-security configuration and must not be treated as an Internet-facing production Nomad cluster.
+
 ## Database configuration
 
 `config/database.yml` uses the PostgreSQL adapter and accepts the following environment variables:
 
 | Variable | Purpose | Default/behavior |
 | --- | --- | --- |
-| `DB_HOST` | PostgreSQL host | Unset for the native libpq default; `db` in Compose |
+| `DB_HOST` | PostgreSQL host | Unset for the native libpq default; `db` in Compose; rendered from Nomad native service discovery in Nomad |
 | `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USERNAME` | PostgreSQL role | Unset for the native libpq default; `postgres` in Compose |
-| `DB_PASSWORD` | PostgreSQL password | Unset natively; `postgres` in Compose |
+| `DB_NAME` | Environment database | Rails environment default; follows `POSTGRES_DB` in Compose |
+| `TEST_DB_NAME` | Test database | `book_reviews_test` |
+| `DB_USERNAME` | PostgreSQL role | Unset for the native libpq default; `book_reviews` in container deployments |
+| `DB_PASSWORD` | PostgreSQL password | Required from `.env` in Compose or a Nomad Variable in Nomad |
 | `DATABASE_URL` | Standard Rails connection URL | If set, Rails merges it over `database.yml` |
 | `RAILS_MAX_THREADS` | Active Record connection-pool size | `5` |
 | `APP_DATABASE_PASSWORD` | Alternate production password | Used only when `DB_PASSWORD` is absent |
 
-Do not commit real database credentials. The credentials in `compose.yaml` are only local development defaults.
+Do not commit real database credentials. `.env` and local Nomad variable files are ignored; `.env.example` contains placeholders only.
 
 ## Open Library seed/import behavior
 
@@ -157,3 +234,4 @@ All CRUD resources use standard Rails REST actions for `index`, `show`, `new`, `
 
 - `docs/architecture_decisions.md` records implementation decisions and trade-offs.
 - `docs/development_log.md` records objective commands, errors, fixes, and verification facts.
+- `docs/nomad_verification.md` records the live Nomad deployment, recovery, persistence, and scaling evidence.

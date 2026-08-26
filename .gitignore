@@ -9,6 +9,11 @@
 
 # Ignore all environment files.
 /.env*
+!/.env.example
+
+# Ignore local Nomad variable specifications, which may contain secrets.
+/nomad/*.local.hcl
+/nomad/*.nv.hcl
 
 # Ignore all logfiles and tempfiles.
 /log/*

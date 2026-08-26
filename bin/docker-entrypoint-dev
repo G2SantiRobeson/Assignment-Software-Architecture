@@ -3,7 +3,4 @@
 # A bind-mounted workspace can retain Puma's PID after an abrupt container stop.
 rm -f tmp/pids/server.pid
 
-# Create the development database on first boot and apply pending migrations.
-bin/rails db:prepare
-
 exec "$@"

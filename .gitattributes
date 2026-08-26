@@ -7,3 +7,8 @@ db/schema.rb linguist-generated
 vendor/* linguist-vendored
 config/credentials/*.yml.enc diff=rails_credentials
 config/credentials.yml.enc diff=rails_credentials
+
+# Files executed inside Linux containers must not inherit Windows CRLF endings.
+bin/* text eol=lf
+*.sh text eol=lf
+*.hcl text eol=lf
