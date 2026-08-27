@@ -173,3 +173,58 @@ Final quality commands on the same tree reported:
 - `bundle exec rails zeitwerk:check`: **All is good!**
 
 The live development database was left with the successful Open Library-backed dataset. The clean full suite operated only on `book_reviews_test`.
+
+## Assignment 02 local Kubernetes runtime verification
+
+The required local Kubernetes behavior was verified on 2026-08-27 after the
+infrastructure audit fixes:
+
+- Minikube 1.38.1 was installed and started with the Docker driver, 4 CPUs and
+  6144 MiB of memory. The single control-plane node reached `Ready` on
+  Kubernetes 1.35.1.
+- Minikube enabled its `standard` host-path StorageClass. The locally built
+  `book-reviews:local` production image was loaded into Minikube and confirmed
+  in the node image list.
+- `kubectl apply --dry-run=client -k k8s` accepted all eight rendered resources.
+  `kubectl apply -k k8s` then created the namespace, ConfigMap, local Secret,
+  two Services, PVC, PostgreSQL Deployment, and Rails Deployment.
+- Both Deployments rolled out successfully. The Rails and PostgreSQL Pods each
+  reached `1/1 Running`. The PVC `book-reviews-postgres-data` reached `Bound`
+  with 2 GiB, `ReadWriteOnce`, StorageClass `standard`, and PV
+  `pvc-0ac58a85-e821-499e-a181-2ff847b736cb`.
+
+### Application Service reachability
+
+`kubectl port-forward service/book-reviews-web 8080:80` exposed the Kubernetes
+Service. Requests to `/up` and `/` both returned HTTP 200. The Service's
+EndpointSlice pointed to the ready Rails Pod.
+
+### Rails self-healing
+
+The original Rails Pod
+`book-reviews-web-7985bbc869-fgst9` (UID
+`ce2a2712-9372-4650-be3a-a62bf1679e8b`) was deleted without changing the
+Deployment. Kubernetes created
+`book-reviews-web-7985bbc869-927sc` (UID
+`9324dd0a-1b03-4624-aedf-2775d78b1abe`). The Deployment returned to one desired,
+ready, available, and updated replica, and `/up` again returned HTTP 200.
+
+### PostgreSQL Pod persistence
+
+A book named `KUBERNETES_PERSISTENCE_MARKER` was created with database ID 301.
+The original PostgreSQL Pod
+`book-reviews-postgres-8475c5476c-l2dm9` (UID
+`c22e3ec1-ffb2-4ff5-86a3-a5200ba41234`) was deleted. Kubernetes created
+`book-reviews-postgres-8475c5476c-bq7s2` (UID
+`c16cd762-1310-4c3b-882e-8142c77aa3cc`). The PVC remained `Bound` to the same PV,
+and the marker still existed with ID 301 and count 1. PostgreSQL logged that the
+data directory already contained a database and skipped initialization, then
+opened the existing database successfully.
+
+### Horizontal replica check
+
+The Rails Deployment was temporarily scaled to two replicas. Both reached
+`Ready` and `Available`, and the Service EndpointSlice contained both Pod IPs.
+The Deployment was then restored to the committed value of one replica and
+settled at one desired/current/ready/available replica. The application and the
+Kubernetes persistence marker remained reachable through the Service afterward.
