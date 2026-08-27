@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: book-reviews-config
+  namespace: book-reviews
+  labels:
+    app.kubernetes.io/name: book-reviews
+data:
+  RAILS_ENV: production
+  RAILS_LOG_TO_STDOUT: "true"
+  RAILS_FORCE_SSL: "false"
+  RAILS_ASSUME_SSL: "false"
+  RAILS_MAX_THREADS: "5"
+  DB_HOST: book-reviews-postgres
+  DB_PORT: "5432"

@@ -2,6 +2,8 @@
 
 This repository contains the coded portion of a server-rendered book-review assignment. It provides CRUD pages for authors, books, reviews, and yearly sales; database-backed reports; summary search; and a reproducible seed-data pipeline. This README and the files under `docs/` are technical implementation records, not the students' final report.
 
+The complete container-orchestration guide for the second delivery is in [`README_DELIVERY_2.md`](README_DELIVERY_2.md). It covers Docker Compose, the local Kubernetes deployment, persistent state, scaling, and the required verification procedures.
+
 ## Required software
 
 - Ruby 3.3.8 (pinned by `.ruby-version`)
@@ -49,17 +51,20 @@ On systems that execute repository binstubs directly, the equivalent forms are `
 
 ## Docker setup
 
-The Compose configuration supplies the database host and development-only `postgres`/`postgres` credentials. Ruby gems are installed in the built `web` image, so rebuild it after changing `Gemfile` or `Gemfile.lock`. From the repository root:
+Copy the example environment file once and replace its development-only password. The resulting `.env` is ignored by Git and is read automatically by Docker Compose:
 
-```text
-docker compose build
-docker compose run --rm web bin/rails db:create
-docker compose run --rm web bin/rails db:migrate
-docker compose run --rm web bin/rails db:seed
-docker compose up
+```powershell
+Copy-Item .env.example .env
+notepad .env
 ```
 
-The seed step is optional. After the first setup, `docker compose up` starts PostgreSQL and Rails and publishes Rails on [http://localhost:3000](http://localhost:3000). The development entrypoint removes a stale Puma PID left by an interrupted container and runs `db:prepare`, so new databases and pending migrations are handled automatically on startup. Stop the services with `docker compose down`. The named `postgres_data` volume preserves database data; do not add `--volumes` unless deleting that data is intended.
+Ruby gems are installed in the built `web` image, so rebuild it after changing `Gemfile` or `Gemfile.lock`. From the repository root, the complete system starts with one command:
+
+```text
+docker compose up --build -d
+```
+
+This starts PostgreSQL and Rails and publishes Rails on [http://localhost:3000](http://localhost:3000). The development entrypoint removes a stale Puma PID and runs `db:prepare`, so new databases and pending migrations are handled automatically. Run `docker compose exec web bin/rails db:seed` only when the assignment dataset must be recreated; the seed intentionally replaces existing domain records. Stop the services with `docker compose down`. The named `postgres_data` volume preserves database data; do not add `--volumes` unless deleting that data is intended.
 
 To prepare the Docker test database and run the suite:
 
@@ -76,13 +81,13 @@ docker compose run --rm -e RAILS_ENV=test web bin/rails test
 | --- | --- | --- |
 | `DB_HOST` | PostgreSQL host | Unset for the native libpq default; `db` in Compose |
 | `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USERNAME` | PostgreSQL role | Unset for the native libpq default; `postgres` in Compose |
-| `DB_PASSWORD` | PostgreSQL password | Unset natively; `postgres` in Compose |
+| `DB_USERNAME` | PostgreSQL role | Unset for the native libpq default; required in Compose `.env` |
+| `DB_PASSWORD` | PostgreSQL password | Unset natively; required in Compose `.env` |
 | `DATABASE_URL` | Standard Rails connection URL | If set, Rails merges it over `database.yml` |
 | `RAILS_MAX_THREADS` | Active Record connection-pool size | `5` |
 | `APP_DATABASE_PASSWORD` | Alternate production password | Used only when `DB_PASSWORD` is absent |
 
-Do not commit real database credentials. The credentials in `compose.yaml` are only local development defaults.
+Do not commit real database credentials. Compose reads them from the ignored `.env`; `.env.example` contains placeholders only.
 
 ## Open Library seed/import behavior
 
