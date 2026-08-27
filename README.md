@@ -162,3 +162,4 @@ All CRUD resources use standard Rails REST actions for `index`, `show`, `new`, `
 
 - `docs/architecture_decisions.md` records implementation decisions and trade-offs.
 - `docs/development_log.md` records objective commands, errors, fixes, and verification facts.
+- `docs/nomad_research.md` contains the Group 7 HashiCorp Nomad investigation. Nomad is research only and is not an implemented deployment target.

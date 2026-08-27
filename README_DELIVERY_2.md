@@ -5,6 +5,10 @@ Ruby on Rails 8.0.5.1, Ruby 3.3.8 y PostgreSQL 16. Docker Compose permite
 ejecutarla localmente y los manifiestos de `k8s/` permiten desplegar la misma
 imagen en un clúster Kubernetes local con Minikube o k3d.
 
+Para el Grupo 7, HashiCorp Nomad es exclusivamente material de investigación.
+No sustituye Kubernetes y no se implementan jobs, servicios ni volúmenes Nomad.
+La investigación está en `docs/nomad_research.md`.
+
 ## 1. Arquitectura
 
 Docker Compose:
@@ -47,7 +51,8 @@ Rails y PostgreSQL se ejecutan siempre en contenedores separados.
 | `.env.example` | Plantilla de variables locales para Compose. |
 | `k8s/namespace.yaml` | Namespace `book-reviews`. |
 | `k8s/configmap.yaml` | Configuración no sensible de Rails y PostgreSQL. |
-| `k8s/secret.yaml` | Credenciales locales de demostración y secreto de Rails. |
+| `k8s/secret.example.yaml` | Plantilla versionada del Secret; no contiene credenciales utilizables. |
+| `k8s/secret.yaml` | Copia local ignorada por Git y Docker; se crea antes del despliegue. |
 | `k8s/postgres-pvc.yaml` | Solicitud de 2 GiB de almacenamiento persistente. |
 | `k8s/postgres-deployment.yaml` | Deployment PostgreSQL con el PVC montado. |
 | `k8s/postgres-service.yaml` | DNS interno estable para PostgreSQL. |
@@ -172,15 +177,28 @@ puede borrarse la imagen local del clúster o utilizarse un tag nuevo.
 - puerto PostgreSQL 5432.
 - configuración HTTP local.
 
-`k8s/secret.yaml` contiene valores exclusivamente locales para que la entrega
-sea reproducible. Los Secrets separan las credenciales de la imagen, pero un
-valor guardado en Git no es un secreto de producción. Antes de un despliegue
-real debe sustituirse por un Secret creado fuera del repositorio o por un
-gestor de secretos.
+El repositorio no guarda credenciales utilizables. Crear la copia local:
+
+```powershell
+Copy-Item k8s/secret.example.yaml k8s/secret.yaml
+notepad k8s/secret.yaml
+```
+
+Reemplazar los tres valores `REPLACE_WITH_...`. Un `SECRET_KEY_BASE` local se
+puede generar sin imprimirlo en el historial del shell con:
+
+```powershell
+docker compose run --rm --no-deps --entrypoint bin/rails web secret
+```
+
+Copiar la salida al archivo local. `k8s/secret.yaml` está ignorado por Git y
+por el contexto Docker. Kubernetes Secrets separan credenciales de la imagen y
+del ConfigMap, pero no cifran de forma segura un manifiesto guardado en Git;
+base64 es solamente codificación.
 
 ### Despliegue
 
-Validar el render de Kustomize y aplicar:
+Validar el render de Kustomize y aplicar después de crear `k8s/secret.yaml`:
 
 ```powershell
 kubectl kustomize k8s
@@ -288,8 +306,9 @@ volver a montar el mismo volumen.
 | Datos de negocio | PostgreSQL | Sí | Todas las réplicas Rails comparten el mismo Service PostgreSQL. |
 | Sesiones | Cookie cifrada/firmada del cliente | Fuera del contenedor | Todas las réplicas comparten `SECRET_KEY_BASE`. |
 | Uploads | No aplicable; Active Storage está deshabilitado | No aplicable | Si se agrega, usar S3, MinIO u object storage compartido. |
-| Cache | Memoria del proceso Rails | No | Usar Redis si se necesita coherencia entre réplicas. |
-| Logs y temporales | STDOUT/filesystem del contenedor | No | Centralizar logs en un entorno real. |
+| Cache | Memoria de proceso en Compose; `tmp/cache` local al pod en production/Kubernetes | No | Usar un cache compartido, por ejemplo Redis, si se necesita coherencia entre réplicas. |
+| Trabajos en segundo plano | Adaptador `async` dentro del proceso Rails | No | Usar una cola compartida y workers separados si los trabajos deben sobrevivir reinicios. |
+| Logs y temporales | STDOUT/filesystem del contenedor | No | Centralizar logs; no depender de temporales locales. |
 
 Rails no conserva estado de negocio en su filesystem. Por eso eliminar un pod
 web no pierde datos importantes. Para probar más de una réplica después de que
@@ -330,4 +349,5 @@ Límites del entorno:
 - El PVC protege frente al reemplazo de pods, pero no sustituye backups.
 - NodePort no incluye TLS ni dominio.
 - PostgreSQL usa una sola réplica.
-- Las credenciales de `k8s/secret.yaml` son solamente valores de demostración.
+- `k8s/secret.yaml` es local, no se versiona y debe contener solamente valores
+  para el clúster de demostración.

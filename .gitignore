@@ -33,3 +33,10 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore locally materialized Kubernetes credentials and database exports.
+/k8s/secret.yaml
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
