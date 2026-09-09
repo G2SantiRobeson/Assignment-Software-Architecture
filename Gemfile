@@ -6,7 +6,7 @@ gem "rails", "8.0.5.1"
 gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
-gem "redis", "~> 5.4"
+gem "redis", "~> 6.0"
 gem "opensearch-ruby", "~> 3.4", require: "opensearch"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
