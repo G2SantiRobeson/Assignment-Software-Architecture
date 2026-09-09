@@ -4,10 +4,10 @@ class ReportsController < ApplicationController
   end
 
   def top_rated_books
-    @books = TopRatedBooksQuery.new.call
+    @books = CachedRankings.rated
   end
 
   def top_selling_books
-    @books = TopSellingBooksQuery.new.call
+    @books = CachedRankings.selling
   end
 end

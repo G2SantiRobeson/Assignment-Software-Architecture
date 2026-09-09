@@ -58,6 +58,7 @@ class AssignmentDatasetBuilder
     result = nil
 
     ApplicationRecord.transaction do
+      CacheInvalidation.all!
       reset_assignment_tables!
       author_records, imported_author_count = create_authors!(imported.authors)
       book_records, imported_book_count = create_books!(imported.books, author_records)
@@ -83,6 +84,17 @@ class AssignmentDatasetBuilder
     end
 
     log_result(result)
+    # Bulk inserts/deletes bypass callbacks. Rebuild only after the enclosing
+    # transaction commits; failed imports leave both projections untouched.
+    ApplicationRecord.current_transaction.after_commit do
+      if Search::Connection.enabled?
+        begin
+          Search::Indexer.new.reindex!
+        rescue StandardError => error
+          @logger&.warn("OpenSearch seed rebuild failed (#{error.class}); run bin/rails search:reindex")
+        end
+      end
+    end
     result
   end
 

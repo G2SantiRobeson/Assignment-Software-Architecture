@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-reviews-redis
+  namespace: book-reviews
+spec:
+  selector: { app.kubernetes.io/component: redis }
+  ports:
+    - { name: redis, port: 6379, targetPort: redis }

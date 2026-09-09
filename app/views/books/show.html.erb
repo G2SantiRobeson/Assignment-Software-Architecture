@@ -11,6 +11,7 @@
     <dt>Author</dt><dd><%= link_to @book.author.name, @book.author %></dd>
     <dt>Publication date</dt><dd><%= @book.date_of_publication.to_fs(:long) %></dd>
     <dt>Lifetime sales</dt><dd><%= number_with_delimiter(@book.number_of_sales) %></dd>
+    <dt>Average review score</dt><dd><%= number_with_precision(@book.average_score, precision: 2) %>/5</dd>
     <dt>Summary</dt><dd><%= @book.summary.presence || "No summary." %></dd>
   </dl>
 </div>

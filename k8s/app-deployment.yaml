@@ -47,7 +47,7 @@ spec:
               memory: 64Mi
       containers:
         - name: rails
-          image: book-reviews:local
+          image: book-reviews:assignment3
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
