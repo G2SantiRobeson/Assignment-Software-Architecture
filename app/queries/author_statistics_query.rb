@@ -56,16 +56,19 @@ class AuthorStatisticsQuery
     [ "total_sales", "desc" ] => Arel.sql("COALESCE(author_sales_statistics.total_sales, 0) DESC, authors.id ASC")
   }.freeze
 
-  def initialize(params = {})
+  def initialize(params = {}, cache: true, **filters)
     raw_params = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params.to_h
-    @params = raw_params.stringify_keys
+    @params = raw_params.merge(filters).stringify_keys
+    @cache = cache
   end
 
   def call
+    statistics = @cache && ReadCache.enabled? ? CachedAuthorStatistics.sources :
+      [ Arel.sql(BOOK_STATISTICS_SQL), Arel.sql(REVIEW_STATISTICS_SQL), Arel.sql(SALES_STATISTICS_SQL) ]
     scope = Author
-      .joins("LEFT JOIN (#{BOOK_STATISTICS_SQL}) author_book_statistics ON author_book_statistics.author_id = authors.id")
-      .joins("LEFT JOIN (#{REVIEW_STATISTICS_SQL}) author_review_statistics ON author_review_statistics.author_id = authors.id")
-      .joins("LEFT JOIN (#{SALES_STATISTICS_SQL}) author_sales_statistics ON author_sales_statistics.author_id = authors.id")
+      .joins(statistics_join(statistics[0], "author_book_statistics"))
+      .joins(statistics_join(statistics[1], "author_review_statistics"))
+      .joins(statistics_join(statistics[2], "author_sales_statistics"))
       .select(
         "authors.*",
         Arel.sql("#{PUBLISHED_BOOKS_EXPRESSION}::bigint AS published_books_count"),
@@ -80,6 +83,15 @@ class AuthorStatisticsQuery
   end
 
   private
+
+  def statistics_join(source, name)
+    # Sources are constant queries or Arel VALUES; aliases are constants.
+    table = Arel::Table.new(name)
+    Arel::Nodes::OuterJoin.new(
+      Arel::Nodes::TableAlias.new(Arel::Nodes::Grouping.new(source), name),
+      Arel::Nodes::On.new(table[:author_id].eq(Author.arel_table[:id]))
+    )
+  end
 
   def filter_author(scope)
     value = @params["author"].to_s.strip

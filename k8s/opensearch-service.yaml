@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-reviews-opensearch
+  namespace: book-reviews
+spec:
+  selector: { app.kubernetes.io/component: opensearch }
+  ports:
+    - { name: search, port: 9200, targetPort: search }

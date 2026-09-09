@@ -13,3 +13,8 @@ data:
   RAILS_MAX_THREADS: "5"
   DB_HOST: book-reviews-postgres
   DB_PORT: "5432"
+  CACHE_ENABLED: "true"
+  SEARCH_ENABLED: "true"
+  REDIS_URL: redis://book-reviews-redis:6379/0
+  OPENSEARCH_URL: http://book-reviews-opensearch:9200
+  OPENSEARCH_INDEX: book_reviews_production_v1

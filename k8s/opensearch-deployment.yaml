@@ -1,0 +1,47 @@
+# Local university deployment only: security disabled, reconstructable emptyDir.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-reviews-opensearch
+  namespace: book-reviews
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app.kubernetes.io/component: opensearch }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/component: opensearch }
+    spec:
+      securityContext: { fsGroup: 1000 }
+      containers:
+        - name: opensearch
+          image: opensearchproject/opensearch:3.3.2
+          env:
+            - { name: discovery.type, value: single-node }
+            - { name: OPENSEARCH_JAVA_OPTS, value: "-Xms512m -Xmx512m" }
+            - { name: DISABLE_INSTALL_DEMO_CONFIG, value: "true" }
+            - { name: DISABLE_SECURITY_PLUGIN, value: "true" }
+          ports:
+            - { name: search, containerPort: 9200 }
+          startupProbe:
+            httpGet: { path: /_cluster/health, port: search }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: [sh, -c, "curl -fsS 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s' | grep -q '\"timed_out\":false'"]
+            periodSeconds: 10
+            timeoutSeconds: 4
+          livenessProbe:
+            httpGet: { path: /_cluster/health, port: search }
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources:
+            requests: { cpu: 250m, memory: 768Mi }
+            limits: { cpu: "1", memory: 1536Mi }
+          volumeMounts:
+            - { name: search-data, mountPath: /usr/share/opensearch/data }
+      volumes:
+        - name: search-data
+          emptyDir: {}

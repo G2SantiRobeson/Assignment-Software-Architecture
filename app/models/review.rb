@@ -1,4 +1,5 @@
 class Review < ApplicationRecord
+  include MaintainsReadModels
   belongs_to :book, inverse_of: :reviews
 
   validates :review_text, presence: true

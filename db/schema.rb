@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_12_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_08_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -39,6 +39,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_000000) do
     t.index ["open_library_key"], name: "index_books_on_open_library_key", unique: true
     t.check_constraint "char_length(btrim(name::text)) > 0", name: "books_name_not_blank"
     t.check_constraint "number_of_sales >= 0", name: "books_number_of_sales_nonnegative"
+  end
+
+  create_table "cache_revisions", primary_key: "key", id: :string, force: :cascade do |t|
+    t.bigint "version", default: 0, null: false
   end
 
   create_table "reviews", force: :cascade do |t|

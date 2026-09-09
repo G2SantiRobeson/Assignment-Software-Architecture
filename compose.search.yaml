@@ -1,0 +1,33 @@
+services:
+  db:
+    extends: { file: compose.yaml, service: db }
+  web:
+    extends: { file: compose.yaml, service: web }
+    environment:
+      SEARCH_ENABLED: "true"
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_INDEX: book_reviews_development_v1
+  opensearch:
+    image: opensearchproject/opensearch:3.3.2
+    environment:
+      discovery.type: single-node
+      bootstrap.memory_lock: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    mem_limit: 1536m
+    healthcheck:
+      test: [CMD-SHELL, "curl -fsS 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=3s' | grep -q '\"timed_out\":false'"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 20
+    restart: unless-stopped
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+volumes:
+  postgres_data:
+  opensearch_data:
