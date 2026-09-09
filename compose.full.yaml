@@ -1,0 +1,16 @@
+services:
+  db:
+    extends: { file: compose.yaml, service: db }
+  web:
+    extends: { file: compose.cache.yaml, service: web }
+    environment:
+      SEARCH_ENABLED: "true"
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_INDEX: book_reviews_development_v1
+  redis:
+    extends: { file: compose.cache.yaml, service: redis }
+  opensearch:
+    extends: { file: compose.search.yaml, service: opensearch }
+volumes:
+  postgres_data:
+  opensearch_data:

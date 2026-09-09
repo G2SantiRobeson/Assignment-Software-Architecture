@@ -10,6 +10,8 @@ class Sale < ApplicationRecord
   after_save :synchronize_affected_book_totals, if: :sales_total_changed?
   after_destroy :synchronize_destroyed_book_total
 
+  include MaintainsReadModels
+
   private
 
   def sales_total_changed?

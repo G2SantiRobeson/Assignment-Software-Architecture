@@ -1,6 +1,8 @@
 class BookSearchesController < ApplicationController
   def index
-    @results = BookSummarySearchQuery.new(query: params[:q], page: params[:page]).call
+    service = SearchService.new(query: params[:q], page: params[:page])
+    @results = service.call
+    @search_backend = service.backend
     @query = @results.query
   end
 end

@@ -1,4 +1,5 @@
 class Book < ApplicationRecord
+  include MaintainsReadModels
   belongs_to :author, inverse_of: :books
 
   has_many :reviews, dependent: :restrict_with_error, inverse_of: :book
@@ -16,6 +17,12 @@ class Book < ApplicationRecord
     ids = book_ids.flatten.compact.uniq.sort
 
     where(id: ids).order(:id).each(&:refresh_number_of_sales!)
+  end
+
+  def average_score
+    return self[:average_score] if has_attribute?(:average_score)
+
+    ReadCache.fetch(CacheKeys.average(id)) { reviews.average(:score) || BigDecimal("0") }
   end
 
   def refresh_number_of_sales!

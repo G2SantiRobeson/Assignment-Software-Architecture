@@ -1,0 +1,460 @@
+{
+  "kind": "engineering_verification_results",
+  "date": "2026-09-08",
+  "report": false,
+  "repository": {
+    "ruby": "3.3.8",
+    "rails": "8.0.5.1",
+    "database": "PostgreSQL 16",
+    "models": [
+      "Author has many Books, restrict deletion",
+      "Book belongs to Author; has many Reviews/Sales, restrict deletion",
+      "Review: book_id, review_text, score, up_votes",
+      "Sale: book_id, year, sales; transactional Book.number_of_sales refresh"
+    ],
+    "preserved_semantics": [
+      "All books count as published in the existing overview",
+      "Author average weights individual reviews, not book averages",
+      "Sales totals sum Sale.sales",
+      "Original ranking tie-breaks, chosen review text and publication-year top-five rules",
+      "PostgreSQL summary-only literal ANY-word search, normalized query and pagination"
+    ]
+  },
+  "files": {
+    "created": [
+      "README_CACHING_SEARCH.md",
+      "app/models/cache_revision.rb",
+      "app/models/concerns/maintains_read_models.rb",
+      "app/services/assignment3_verification.rb",
+      "app/services/cache_invalidation.rb",
+      "app/services/cache_keys.rb",
+      "app/services/cached_author_statistics.rb",
+      "app/services/cached_rankings.rb",
+      "app/services/read_cache.rb",
+      "app/services/search/connection.rb",
+      "app/services/search/indexer.rb",
+      "app/services/search/open_search_backend.rb",
+      "app/services/search_service.rb",
+      "compose.cache.yaml",
+      "compose.full.yaml",
+      "compose.search.yaml",
+      "db/migrate/20260908000000_create_cache_revisions.rb",
+      "k8s/opensearch-deployment.yaml",
+      "k8s/opensearch-service.yaml",
+      "k8s/redis-deployment.yaml",
+      "k8s/redis-service.yaml",
+      "lib/tasks/assignment3.rake",
+      "lib/tasks/search.rake",
+      "script/verify_compose.ps1",
+      "test/services/read_models_test.rb",
+      "test/services/search_service_test.rb",
+      "script/assignment3-results.json"
+    ],
+    "modified": [
+      ".env.example",
+      "Gemfile",
+      "Gemfile.lock",
+      "README.md",
+      "app/controllers/book_searches_controller.rb",
+      "app/controllers/reports_controller.rb",
+      "app/models/author.rb",
+      "app/models/book.rb",
+      "app/models/review.rb",
+      "app/models/sale.rb",
+      "app/queries/author_statistics_query.rb",
+      "app/services/assignment_dataset_builder.rb",
+      "app/views/book_searches/index.html.erb",
+      "app/views/books/show.html.erb",
+      "compose.yaml",
+      "db/schema.rb",
+      "k8s/app-deployment.yaml",
+      "k8s/configmap.yaml",
+      "k8s/kustomization.yaml"
+    ],
+    "ignored_local_files": [
+      ".env (isolated Compose credentials)",
+      "k8s/secret.yaml (preserved cluster credentials; runtime metadata removed)"
+    ]
+  },
+  "checks": [
+    {
+      "command": "docker compose -p assignment3verify -f compose.yaml run --rm -e RAILS_ENV=test -e PARALLEL_WORKERS=2 web bin/rails test",
+      "status": "PASS",
+      "result": "Before modifications: 93 runs, 580 assertions, zero failures/errors/skips."
+    },
+    {
+      "command": "docker run --rm --mount type=bind,source=<repository>,target=/app --workdir /app --entrypoint bundle assignment3verify-web lock",
+      "status": "PASS",
+      "result": "Locked redis 5.4.1 and opensearch-ruby 3.4.0; Rails/Ruby unchanged."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml build web",
+      "status": "PASS",
+      "result": "Development image builds."
+    },
+    {
+      "command": "docker build -t book-reviews:local .",
+      "status": "PASS",
+      "result": "Production build, Bootsnap and asset precompilation pass."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.yaml run --rm -e RAILS_ENV=test -e PARALLEL_WORKERS=2 web bin/rails test",
+      "status": "PASS",
+      "result": "Final: 108 runs, 740 assertions, zero failures/errors/skips. Earlier run had one failure and four errors; corrected."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml run --rm --no-deps --entrypoint bin/rubocop web",
+      "status": "PASS",
+      "result": "74 files inspected, no offenses."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml run --rm --no-deps --entrypoint bin/rails web zeitwerk:check",
+      "status": "PASS",
+      "result": "All is good."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.yaml run --rm --no-deps --entrypoint bin/brakeman web --no-pager --except EOLRails",
+      "status": "PASS",
+      "result": "Final: zero security warnings. Earlier dynamic SQL warnings removed using Arel VALUES and sanitized advisory-lock arguments."
+    },
+    {
+      "command": "./script/verify_compose.ps1 -ProjectName assignment3verify",
+      "status": "PASS",
+      "result": "All four Compose configs validated and started. Six HTTP endpoints per mode returned 200; omitted optional services were stopped."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml exec -T redis redis-cli ping",
+      "status": "PASS",
+      "result": "PONG"
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml exec -T opensearch curl -fsS http://localhost:9200/_cluster/health",
+      "status": "PASS",
+      "result": "Green single-node cluster."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml exec -T web bin/rails search:reindex",
+      "status": "PASS",
+      "result": "300 books and 1609 reviews indexed. Initial attempt timed out; separate 60-second administrative timeout fixed it."
+    },
+    {
+      "command": "docker compose -p assignment3verify -f compose.full.yaml exec -T web bin/rails assignment3:verify",
+      "status": "PASS",
+      "result": "Final full application verification passed including normal CRUD forms/controllers, actual Redis and OpenSearch, outages, manual recovery and cleanup."
+    },
+    {
+      "command": "kubectl apply --dry-run=server -k k8s",
+      "status": "PASS",
+      "result": "Final full manifests accepted."
+    },
+    {
+      "command": "kubectl apply -k k8s",
+      "status": "PASS",
+      "result": "Final application successful. An intermediate copied Secret resourceVersion conflict was fixed by removing runtime metadata from ignored local secret.yaml; credentials preserved."
+    },
+    {
+      "command": "minikube image load --daemon --overwrite book-reviews:assignment3",
+      "status": "PASS",
+      "result": "Distinct Assignment 3 tag loaded. Reusing book-reviews:local initially selected a stale Assignment 2 image."
+    },
+    {
+      "command": "kubectl -n book-reviews rollout status deployment/book-reviews-web --timeout=60s",
+      "status": "PASS",
+      "result": "Final Rails deployment ready."
+    },
+    {
+      "command": "kubectl -n book-reviews rollout status deployment/book-reviews-redis --timeout=60s",
+      "status": "PASS",
+      "result": "Ready."
+    },
+    {
+      "command": "kubectl -n book-reviews rollout status deployment/book-reviews-opensearch --timeout=60s",
+      "status": "PASS",
+      "result": "Ready; first wait expired during image pulling."
+    },
+    {
+      "command": "kubectl -n book-reviews exec deployment/book-reviews-web -c rails -- bin/rails search:reindex",
+      "status": "PASS",
+      "result": "301 books and 1609 reviews indexed in production index."
+    },
+    {
+      "command": "kubectl -n book-reviews exec -i deployment/book-reviews-web -c rails -- bin/rails runner -",
+      "status": "PASS",
+      "result": "Read-only smoke: Redis PONG; OpenSearch title match; caches equal original PostgreSQL queries; seven HTTP endpoints 200; Assignment 2 marker id 301 retained."
+    },
+    {
+      "command": "kubectl -n book-reviews get deployments,pvc",
+      "status": "PASS",
+      "result": "Four deployments each 1/1; original 2Gi PostgreSQL PVC Bound."
+    },
+    {
+      "command": "git -c core.whitespace=cr-at-eol diff --check",
+      "status": "PASS",
+      "result": "No whitespace errors, allowing repository CRLF endings."
+    }
+  ],
+  "matrix": [
+    {
+      "requirement": "0",
+      "description": "Inspect repository and run baseline before modifications",
+      "location": "Gemfile; app/models; app/queries; config; db/schema.rb; Dockerfile*; compose.yaml; k8s; test; README*",
+      "evidence": "Baseline 93/580; actual relationships and SQL inspected",
+      "status": "PASS"
+    },
+    {
+      "requirement": "1",
+      "description": "Redis + official OpenSearch Ruby client + existing PostgreSQL/Rails",
+      "location": "Gemfile; Gemfile.lock",
+      "evidence": "Both Docker builds; live integration",
+      "status": "PASS"
+    },
+    {
+      "requirement": "2",
+      "description": "Four optional combinations; disabled means no connection; runtime fallback",
+      "location": "ReadCache; SearchService; compose*.yaml",
+      "evidence": "verify_compose.ps1; ReadModelsTest; SearchServiceTest; assignment3:verify",
+      "status": "PASS"
+    },
+    {
+      "requirement": "3.1",
+      "description": "Individual author count/average/sales cache rows",
+      "location": "CachedAuthorStatistics; CacheKeys.author",
+      "evidence": "Cold/warm semantic comparison and real author-page checks",
+      "status": "PASS"
+    },
+    {
+      "requirement": "3.2",
+      "description": "Top 10 rated cache",
+      "location": "CachedRankings.rated; CacheKeys::TOP_RATED",
+      "evidence": "Unit comparison and real CRUD verification",
+      "status": "PASS"
+    },
+    {
+      "requirement": "3.3",
+      "description": "Top 50 selling cache",
+      "location": "CachedRankings.selling; CacheKeys::TOP_SELLING",
+      "evidence": "Unit comparison and real sale CRUD verification",
+      "status": "PASS"
+    },
+    {
+      "requirement": "3.4",
+      "description": "Per-book average cache and centralized keys",
+      "location": "Book#average_score; ReadCache; CacheKeys",
+      "evidence": "Miss/population/hit test and real Redis entry check",
+      "status": "PASS"
+    },
+    {
+      "requirement": "4",
+      "description": "Cache-aside hit/miss; database source of truth; failure fallback",
+      "location": "ReadCache.fetch; ReadCache.fetch_multi",
+      "evidence": "Aggregate SQL-count test; disabled/failing Redis tests",
+      "status": "PASS"
+    },
+    {
+      "requirement": "5.1",
+      "description": "Review create/update/delete invalidate average, rated and author",
+      "location": "CacheInvalidation; MaintainsReadModels; CacheRevision",
+      "evidence": "assert_invalidated on create/update/destroy; HTTP demonstration",
+      "status": "PASS"
+    },
+    {
+      "requirement": "5.2",
+      "description": "Sale create/update/delete invalidate selling and author",
+      "location": "CacheInvalidation; Sale callbacks",
+      "evidence": "assert_invalidated on create/update/destroy; HTTP demonstration",
+      "status": "PASS"
+    },
+    {
+      "requirement": "5.3",
+      "description": "Book/author edits invalidate author rows; old/new relationships",
+      "location": "CacheInvalidation",
+      "evidence": "Book/author edit tests; review/sale/book moves; multiple saves",
+      "status": "PASS"
+    },
+    {
+      "requirement": "5.4",
+      "description": "Post-commit deletion, no FLUSH, explicit invalidation independent of TTL",
+      "location": "CacheRevision.invalidate!; ReadCache.delete_versions",
+      "evidence": "Rollback, failed invalidation, disabled writes and stale-fill tests",
+      "status": "PASS"
+    },
+    {
+      "requirement": "6",
+      "description": "Avoid stale mutable ranking data and preserve tie-breaking",
+      "location": "CachedRankings; Book invalidations",
+      "evidence": "Current author/book name test; full ranking equivalence",
+      "status": "PASS"
+    },
+    {
+      "requirement": "7",
+      "description": "Search abstraction; ranked/paginated books; title/summary/review search",
+      "location": "SearchService; Search::OpenSearchBackend; BookSearchesController",
+      "evidence": "Service query test and real three-field matching",
+      "status": "PASS"
+    },
+    {
+      "requirement": "8",
+      "description": "Separate book/review documents, explicit minimal mappings, keyword book IDs",
+      "location": "Search::Indexer::DEFINITION; document",
+      "evidence": "RecordingClient CRUD tests and live indexed search",
+      "status": "PASS"
+    },
+    {
+      "requirement": "9",
+      "description": "Group unique books by best score; count; pagination; bulk hydration",
+      "location": "Search::OpenSearchBackend",
+      "evidence": "Live duplicate review test, two pages, relevance-order comparison",
+      "status": "PASS"
+    },
+    {
+      "requirement": "10",
+      "description": "Book/review CRUD synchronize after commit; deleted book removes review projections",
+      "location": "MaintainsReadModels; Search::Indexer",
+      "evidence": "CRUD, orphan projection cleanup and rollback tests; live delete checks",
+      "status": "PASS"
+    },
+    {
+      "requirement": "11",
+      "description": "Disabled/error fallback remains Assignment 1 summary-only query",
+      "location": "Unmodified BookSummarySearchQuery; SearchService",
+      "evidence": "Disabled/unavailable/partial-result tests and real outage checks",
+      "status": "PASS"
+    },
+    {
+      "requirement": "12",
+      "description": "Deterministic rebuild with explicit mappings, batched data, progress and failure exit",
+      "location": "lib/tasks/search.rake; Search::Indexer#reindex!",
+      "evidence": "Successful repeated Compose and Kubernetes reindex",
+      "status": "PASS"
+    },
+    {
+      "requirement": "13",
+      "description": "Four standalone runnable Compose entry files with correct flags",
+      "location": "compose.yaml; compose.cache.yaml; compose.search.yaml; compose.full.yaml",
+      "evidence": "All configs and all four deployments smoke-tested",
+      "status": "PASS"
+    },
+    {
+      "requirement": "14",
+      "description": "Stable Redis image; ephemeral cache; cache-loss tolerance",
+      "location": "compose.cache.yaml; k8s/redis-deployment.yaml",
+      "evidence": "Redis 7.4.7-alpine; PONG; restart across mode tests",
+      "status": "PASS"
+    },
+    {
+      "requirement": "15",
+      "description": "Pinned single-node local OpenSearch, heap/resources, security configuration",
+      "location": "compose.search.yaml; k8s/opensearch-deployment.yaml",
+      "evidence": "OpenSearch 3.3.2 healthy in Compose and minikube",
+      "status": "PASS"
+    },
+    {
+      "requirement": "16",
+      "description": "Extend existing Kubernetes with Redis/OpenSearch Deployment+Service; preserve app/DB",
+      "location": "k8s/*.yaml",
+      "evidence": "Server dry-run; full deployment; PVC and marker retained",
+      "status": "PASS"
+    },
+    {
+      "requirement": "17",
+      "description": "Meaningful cache, invalidation, relationship, search, synchronization and fallback tests",
+      "location": "test/services/read_models_test.rb; test/services/search_service_test.rb; existing tests",
+      "evidence": "108 tests, 740 assertions; live search-field semantics additionally verified",
+      "status": "PASS"
+    },
+    {
+      "requirement": "18",
+      "description": "Executable full demonstration through normal app mechanisms; fail nonzero",
+      "location": "Assignment3Verification; lib/tasks/assignment3.rake",
+      "evidence": "Final real HTTP/CSRF/forms/controllers demonstration passed",
+      "status": "PASS"
+    },
+    {
+      "requirement": "19",
+      "description": "Actively test stale/failure cases and report only observed incidents",
+      "location": "ReadModelsTest; SearchServiceTest; Assignment3Verification",
+      "evidence": "Revision query-cache bug observed/fixed; real timeout observed/repaired; deliberate outage recovery passed",
+      "status": "PASS"
+    },
+    {
+      "requirement": "20",
+      "description": "DB writes survive optional failures; logs; manual recovery; no distributed transaction",
+      "location": "ReadCache; Search::Indexer; search:reindex",
+      "evidence": "Unit and real outage tests; PostgreSQL writes retained",
+      "status": "PASS"
+    },
+    {
+      "requirement": "21",
+      "description": "Visible boundaries, optional read projections, Rails remains app",
+      "location": "app/services/read_cache.rb; app/services/search*; cache revisions",
+      "evidence": "Code inspection; four-mode deployment evidence",
+      "status": "PASS"
+    },
+    {
+      "requirement": "22",
+      "description": "Existing routes/UI/semantics, minimal gems, env configuration, no N+1 hydration, code checks",
+      "location": "Existing controllers/views/queries plus adapters; Gemfile",
+      "evidence": "108 tests; RuboCop clean; Brakeman zero warnings; Zeitwerk pass",
+      "status": "PASS"
+    },
+    {
+      "requirement": "23",
+      "description": "No report or submission-ready ADR",
+      "location": "Only implementation, tests, runtime instructions and factual verification data added",
+      "evidence": "File inventory below",
+      "status": "PASS"
+    },
+    {
+      "requirement": "24",
+      "description": "Actual tests, migrations, four configs, full deployment, connectivity, reindex, demo, Kubernetes",
+      "location": "Commands in checks",
+      "evidence": "All final checks pass; earlier failures retained in history",
+      "status": "PASS"
+    },
+    {
+      "requirement": "25",
+      "description": "Factual summary, files, commands, tests, full matrix, actual incidents and limitations",
+      "location": "This machine-readable verification record and final response",
+      "evidence": "Engineering facts only",
+      "status": "PASS"
+    },
+    {
+      "requirement": "26",
+      "description": "All technically applicable requirements accounted for",
+      "location": "All matrix entries",
+      "evidence": "Final automated, Compose and Kubernetes checks pass",
+      "status": "PASS"
+    }
+  ],
+  "observed_stale_data": [
+    {
+      "symptom": "Stale-fill regression test returned 2 instead of current value 5",
+      "cause": "Rails SQL query cache retained an earlier cache revision",
+      "fix": "CacheRevision.versions reads uncached",
+      "verification": "Regression passes; outage/recovery and final live verification pass"
+    },
+    {
+      "symptom": "Initial OpenSearch projection was incomplete after startup/reindex timeout",
+      "cause": "Administrative index replacement reused the two-second interactive request timeout",
+      "fix": "Separate 60-second reindex client; rebuild from PostgreSQL",
+      "verification": "300/1609 Compose and 301/1609 Kubernetes reindex; full live demonstration passes"
+    }
+  ],
+  "limitations": [
+    "Search write failures are logged but not durably retried; run search:reindex after recovery.",
+    "Pause writes during rebuild; search may temporarily return partial projection until rebuild completes.",
+    "Kubernetes OpenSearch emptyDir is lost on pod replacement; reindex after replacement.",
+    "Cardinality count is approximate at large scale; result-window overflow falls back to PostgreSQL.",
+    "Cache revision rows grow with deleted IDs; no pruning job.",
+    "Cache hits still read lightweight PostgreSQL metadata and current display fields.",
+    "Arbitrary direct bulk SQL bypasses callbacks; supplied seed builder handles its own invalidation/rebuild.",
+    "Local OpenSearch security is disabled; not production-grade."
+  ],
+  "running_state": {
+    "compose_project": "assignment3verify",
+    "url": "http://localhost:3000",
+    "kubernetes_namespace": "book-reviews",
+    "deployments": "all four 1/1",
+    "postgresql_preserved": "50 authors, 301 books, 1609 reviews, 1500 sales; original PVC and marker id 301 retained"
+  }
+}
