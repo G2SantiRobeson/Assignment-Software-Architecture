@@ -7,6 +7,7 @@
   </div>
 </div>
 <div class="card">
+  <%= image_tag uploaded_image_path(@author.image), alt: @author.name, width: 240 if @author.image.attached? %>
   <dl class="details">
     <dt>Date of birth</dt><dd><%= @author.date_of_birth&.to_fs(:long) || "Not recorded" %></dd>
     <dt>Country of origin</dt><dd><%= @author.country_of_origin.presence || "Not recorded" %></dd>

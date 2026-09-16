@@ -1,0 +1,31 @@
+# RWO permits multiple pods on ONE node, not one claim per replica.
+# script/kubernetes.ps1 labels that node and all upload consumers select it.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: book-reviews-uploads
+  namespace: book-reviews
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 2Gi }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: book-reviews-redis-data
+  namespace: book-reviews
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 1Gi }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: book-reviews-search-data
+  namespace: book-reviews
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 2Gi }

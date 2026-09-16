@@ -1,5 +1,9 @@
 # Running caching and search
 
+The development Compose commands below remain available. Kubernetes has been
+extended for Assignment 4; use [the current operational commands](script/assignment4-commands.txt)
+for its image, Traefik ingress, shared uploads and three replicas.
+
 These are development commands and verification notes, not the university report.
 Run commands from the repository root. Keep the existing `.env` from Assignment 2,
 or copy `.env.example` to `.env` and replace its example database password.

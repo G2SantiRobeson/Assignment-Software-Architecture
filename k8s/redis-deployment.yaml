@@ -5,6 +5,7 @@ metadata:
   namespace: book-reviews
 spec:
   replicas: 1
+  strategy: { type: Recreate }
   selector:
     matchLabels: { app.kubernetes.io/component: redis }
   template:
@@ -14,7 +15,9 @@ spec:
       containers:
         - name: redis
           image: redis:7.4.7-alpine
-          args: [--save, "", --appendonly, "no", --maxmemory, 128mb, --maxmemory-policy, allkeys-lru]
+          args: [--appendonly, "yes", --maxmemory, 128mb, --maxmemory-policy, noeviction]
+          volumeMounts:
+            - { name: redis-data, mountPath: /data }
           ports:
             - { name: redis, containerPort: 6379 }
           readinessProbe:
@@ -26,3 +29,6 @@ spec:
           resources:
             requests: { cpu: 50m, memory: 64Mi }
             limits: { cpu: 250m, memory: 192Mi }
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim: { claimName: book-reviews-redis-data }

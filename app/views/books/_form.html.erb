@@ -1,6 +1,10 @@
 <%= form_with model: book do |form| %>
   <%= render "shared/form_errors", record: book %>
   <div class="field">
+    <%= form.label :image, "Book cover" %>
+    <%= form.file_field :image, accept: "image/png,image/jpeg,image/webp" %>
+  </div>
+  <div class="field">
     <%= form.label :name %>
     <%= form.text_field :name, required: true, autofocus: true %>
   </div>

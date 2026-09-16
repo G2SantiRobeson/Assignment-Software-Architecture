@@ -1,5 +1,7 @@
 class Book < ApplicationRecord
   include MaintainsReadModels
+  include HasImage
+  has_one_attached :image
   belongs_to :author, inverse_of: :books
 
   has_many :reviews, dependent: :restrict_with_error, inverse_of: :book
@@ -19,8 +21,10 @@ class Book < ApplicationRecord
     where(id: ids).order(:id).each(&:refresh_number_of_sales!)
   end
 
-  def average_score
+  def average_score(cache: true)
     return self[:average_score] if has_attribute?(:average_score)
+
+    return reviews.average(:score) || BigDecimal("0") unless cache
 
     ReadCache.fetch(CacheKeys.average(id)) { reviews.average(:score) || BigDecimal("0") }
   end
