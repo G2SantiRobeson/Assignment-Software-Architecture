@@ -1,5 +1,9 @@
 <%= form_with model: author do |form| %>
   <%= render "shared/form_errors", record: author %>
+  <div class="field">
+    <%= form.label :image, "Author image" %>
+    <%= form.file_field :image, accept: "image/png,image/jpeg,image/webp" %>
+  </div>
 
   <div class="field">
     <%= form.label :name %>

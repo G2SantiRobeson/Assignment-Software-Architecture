@@ -1,0 +1,23 @@
+services:
+  db:
+    extends: { file: compose.full.yaml, service: db }
+  prepare:
+    extends: { file: compose.full.yaml, service: prepare }
+  web:
+    extends: { file: compose.full.yaml, service: web }
+    deploy:
+      replicas: 3
+  static:
+    extends: { file: compose.full.yaml, service: static }
+  traefik:
+    extends: { file: compose.full.yaml, service: traefik }
+  redis:
+    extends: { file: compose.full.yaml, service: redis }
+  opensearch:
+    extends: { file: compose.full.yaml, service: opensearch }
+
+volumes:
+  postgres_data:
+  uploads:
+  redis_data:
+  opensearch_data:

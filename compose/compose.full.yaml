@@ -1,0 +1,43 @@
+services:
+  db:
+    extends: { file: compose.proxy.yaml, service: db }
+  prepare:
+    extends: { file: compose.proxy.yaml, service: prepare }
+    environment:
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_INDEX: book_reviews_production_v1
+    # Bulk indexing after preparation avoids per-record indexing during initial seeds.
+    command: [bash, -ec, 'mkdir -p "$$UPLOADS_PATH"; chown 1000:1000 "$$UPLOADS_PATH"; ./bin/rails db:prepare; SEARCH_ENABLED=true ./bin/rails search:ensure_index']
+    depends_on:
+      opensearch: { condition: service_healthy }
+  web:
+    extends: { file: compose.proxy.yaml, service: web }
+    environment:
+      CACHE_ENABLED: "true"
+      SEARCH_ENABLED: "true"
+      REDIS_URL: redis://redis:6379/0
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENSEARCH_INDEX: book_reviews_production_v1
+      SESSION_STORE: redis
+      SESSION_REDIS_URL: redis://redis:6379/1
+    depends_on:
+      redis: { condition: service_healthy }
+      opensearch: { condition: service_healthy }
+  static:
+    extends: { file: compose.proxy.yaml, service: static }
+  traefik:
+    extends: { file: compose.proxy.yaml, service: traefik }
+  redis:
+    extends: { file: ../compose.cache.yaml, service: redis }
+    # Sessions are state: persist them, and never evict active sessions for cache entries.
+    command: [redis-server, --appendonly, "yes", --maxmemory, 128mb, --maxmemory-policy, noeviction]
+    volumes:
+      - redis_data:/data
+  opensearch:
+    extends: { file: ../compose.search.yaml, service: opensearch }
+
+volumes:
+  postgres_data:
+  uploads:
+  redis_data:
+  opensearch_data:

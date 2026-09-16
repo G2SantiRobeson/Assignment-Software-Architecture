@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: book-reviews-prepare
+  namespace: book-reviews
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: prepare
+          image: book-reviews:assignment4
+          imagePullPolicy: IfNotPresent
+          args: ["./bin/rails", "db:prepare"]
+          envFrom:
+            - configMapRef: { name: book-reviews-config }
+            - secretRef: { name: book-reviews-secrets }
+          env:
+            - { name: SEARCH_ENABLED, value: "false" }
+            - { name: CACHE_ENABLED, value: "false" }
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: "1", memory: 768Mi }

@@ -1,0 +1,79 @@
+services:
+  db:
+    extends: { file: compose.single.yaml, service: db }
+  prepare:
+    extends: { file: compose.single.yaml, service: prepare }
+  web:
+    extends: { file: compose.single.yaml, service: web }
+    ports: !reset []
+    environment:
+      APP_HOST: ${APP_HOST:-app.localhost}
+      SESSION_SECURE: "true"
+      RAILS_ASSUME_SSL: "true"
+      RAILS_FORCE_SSL: "true"
+      RAILS_SERVE_STATIC_FILES: "false"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.rails.rule: Host(`${APP_HOST:-app.localhost}`)
+      traefik.http.routers.rails.entrypoints: websecure
+      traefik.http.routers.rails.tls: "true"
+      traefik.http.services.rails.loadbalancer.server.port: "3000"
+      traefik.http.services.rails.loadbalancer.healthcheck.path: /ready
+      traefik.http.services.rails.loadbalancer.healthcheck.interval: 5s
+      traefik.http.services.rails.loadbalancer.healthcheck.timeout: 2s
+  static:
+    image: book-reviews:assignment4
+    entrypoint: [bundle, exec, puma]
+    command: [-b, "tcp://0.0.0.0:3001", -t, "2:8", infra/static/config.ru]
+    environment:
+      UPLOADS_PATH: ${UPLOADS_PATH:-/rails/storage}
+    volumes:
+      - uploads:${UPLOADS_PATH:-/rails/storage}:ro
+    depends_on:
+      prepare: { condition: service_completed_successfully }
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:3001/up]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.static.rule: Host(`${APP_HOST:-app.localhost}`) && (PathPrefix(`/assets/`) || PathPrefix(`/uploads/`))
+      traefik.http.routers.static.priority: "100"
+      traefik.http.routers.static.entrypoints: websecure
+      traefik.http.routers.static.tls: "true"
+      traefik.http.services.static.loadbalancer.server.port: "3001"
+  traefik:
+    image: traefik:v3.6.13
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=:${HTTPS_PORT:-443}
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.constraints=Label(`com.docker.compose.project`,`${COMPOSE_PROJECT_NAME:-book-reviews-a4}`)
+      - --providers.file.filename=/etc/traefik/tls.yaml
+      - --ping=true
+      - --accesslog=true
+      - --accesslog.format=json
+      - --accesslog.fields.headers.names.X-App-Instance=keep
+      - --metrics.prometheus=true
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../infra/traefik/tls.yaml:/etc/traefik/tls.yaml:ro
+      - ../tmp/edge/tls:/certs:ro
+    healthcheck:
+      test: [CMD, traefik, healthcheck, --ping]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  uploads:

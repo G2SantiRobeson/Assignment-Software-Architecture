@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-reviews-static
+  namespace: book-reviews
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/component: static }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/component: static }
+    spec:
+      nodeSelector: { book-reviews-storage: "true" }
+      securityContext: { fsGroup: 1000 }
+      containers:
+        - name: static
+          image: book-reviews:assignment4
+          imagePullPolicy: IfNotPresent
+          command: [bundle, exec, puma]
+          args: [-b, "tcp://0.0.0.0:3001", -t, "2:8", infra/static/config.ru]
+          envFrom:
+            - configMapRef: { name: book-reviews-config }
+          ports:
+            - { name: http, containerPort: 3001 }
+          readinessProbe:
+            httpGet: { path: /up, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /up, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 25m, memory: 64Mi }
+            limits: { cpu: 250m, memory: 192Mi }
+          volumeMounts:
+            - { name: uploads, mountPath: /rails/storage, readOnly: true }
+      volumes:
+        - name: uploads
+          persistentVolumeClaim: { claimName: book-reviews-uploads }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-reviews-static
+  namespace: book-reviews
+spec:
+  selector: { app.kubernetes.io/component: static }
+  ports:
+    - { name: http, port: 80, targetPort: http }

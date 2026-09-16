@@ -1,5 +1,8 @@
 # Book Reviews
 
+Assignment 4 (Grupo 7, Traefik): executable deployment, Kubernetes, verification
+and load-test commands are in [script/assignment4-commands.txt](script/assignment4-commands.txt).
+
 This repository contains the coded portion of a server-rendered book-review assignment. It provides CRUD pages for authors, books, reviews, and yearly sales; database-backed reports; summary search; and a reproducible seed-data pipeline. This README and the files under `docs/` are technical implementation records, not the students' final report.
 
 The complete container-orchestration guide for the second delivery is in [`README_DELIVERY_2.md`](README_DELIVERY_2.md). It covers Docker Compose, the local Kubernetes deployment, persistent state, scaling, and the required verification procedures.

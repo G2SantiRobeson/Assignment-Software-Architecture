@@ -18,6 +18,8 @@
 # secret.example.yaml is documentation only; secret.yaml must never be baked
 # into the Rails image.
 /k8s/secret.yaml
+/k8s/generated/
+/results/
 
 # Ignore local database exports and embedded database files.
 **/*.sql
