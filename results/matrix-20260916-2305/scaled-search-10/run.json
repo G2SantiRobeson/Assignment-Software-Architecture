@@ -1,0 +1,11 @@
+{
+    "url":  "https://app.localhost/book-search?q=architecture",
+    "durationSeconds":  300,
+    "startedUtc":  "2026-09-17T04:21:55.8641748Z",
+    "project":  "book-reviews-a4",
+    "kubernetesContext":  "",
+    "requests":  10,
+    "deployment":  "scaled",
+    "endpoint":  "search",
+    "expectedReplicas":  3
+}

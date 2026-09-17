@@ -1,0 +1,52 @@
+PASS: GET /up
+PASS: GET /ready
+PASS: GET /books
+PASS: GET /authors
+PASS: GET /reports/author-statistics
+PASS: GET /reports/top-rated-books
+PASS: GET /reports/top-selling-books
+PASS: author multipart upload with CSRF
+PASS: shared flash session across redirect
+PASS: author image bytes
+PASS: book cover upload with CSRF
+PASS: CSRF session accepted across different replicas
+PASS: book cover bytes
+PASS: image HTTP cache headers
+PASS: image conditional cache hit
+PASS: image served by static origin through Traefik
+PASS: compiled CSS
+PASS: CSS through static origin
+PASS: search page
+PASS: expected search backend
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: traffic distribution {"70179614f9fa"=>15, "bc4c43eb4dd3"=>13, "916dc64887fa"=>14}
+{"results":[{"method":"get","path":"/up","status":200,"instance":null},{"method":"get","path":"/ready","status":200,"instance":null},{"method":"get","path":"/books","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/authors","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/reports/author-statistics","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/reports/top-rated-books","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/reports/top-selling-books","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/authors/new","status":200,"instance":"916dc64887fa"},{"method":"post","path":"/authors","status":302,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/authors/103","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/uploads/u98gvfrv8ywougt4xk1mejnc0six.png","status":200,"instance":null},{"method":"get","path":"/books/new","status":200,"instance":"bc4c43eb4dd3"},{"method":"post","path":"/books","status":302,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/uploads/w056gp8wnouvt7ghczf6m2gmpyz2.png","status":200,"instance":null},{"method":"get","path":"/uploads/w056gp8wnouvt7ghczf6m2gmpyz2.png","status":304,"instance":null},{"method":"get","path":"/assets/application-9f6effe6.css","status":200,"instance":null},{"method":"get","path":"/book-search?q=Architecture","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"bc4c43eb4dd3"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"},{"method":"get","path":"/books/603","status":200,"instance":"70179614f9fa"},{"method":"get","path":"/books/603","status":200,"instance":"916dc64887fa"}],"instances":{"70179614f9fa":15,"bc4c43eb4dd3":13,"916dc64887fa":14},"book_path":"/books/603","image_path":"/uploads/w056gp8wnouvt7ghczf6m2gmpyz2.png"}

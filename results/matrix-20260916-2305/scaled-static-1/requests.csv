@@ -1,0 +1,2 @@
+timestamp,endpoint,deployment,instance,status,response_time_ms
+2026-09-17T03:50:17.101658756Z,static,scaled,edge-files,200,8.157385

@@ -1,0 +1,14 @@
+[
+    {
+        "Path":  "C:\\Users\\chens\\OneDrive\\Escritorio\\software_architecture\\Assignment-1-Software-Architecture\\load\\edge.js",
+        "Hash":  "A13A908E0EC4EB3BB076CACFB25BEAF642E68F8F070516FCD363FD5AC05F57F8"
+    },
+    {
+        "Path":  "C:\\Users\\chens\\OneDrive\\Escritorio\\software_architecture\\Assignment-1-Software-Architecture\\load\\process_snapshot.sh",
+        "Hash":  "138BA34D02784084EF5F49F5DA5B18DD7E955ED63D615C3B4C997CCB3442A30D"
+    },
+    {
+        "Path":  "C:\\Users\\chens\\OneDrive\\Escritorio\\software_architecture\\Assignment-1-Software-Architecture\\script\\collect_metrics.ps1",
+        "Hash":  "80D3F241E96031E79239C72E6F080801F296878A9D5851840D40F36DA9CD6CED"
+    }
+]

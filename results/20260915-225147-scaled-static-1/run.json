@@ -1,0 +1,8 @@
+{
+    "durationSeconds":  3,
+    "startedUtc":  "2026-09-16T01:51:47.9063656Z",
+    "deployment":  "scaled",
+    "endpoint":  "static",
+    "requests":  1,
+    "url":  "https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png"
+}

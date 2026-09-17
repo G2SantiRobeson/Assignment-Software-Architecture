@@ -1,0 +1,19 @@
+HTTP/1.1 200 OK
+Cache-Control: max-age=0, private, must-revalidate
+Content-Length: 3263
+Content-Type: text/html; charset=utf-8
+Etag: W/"724e7de6e41a1ad2c55ad3802929101c"
+Link: </assets/application-9f6effe6.css>; rel=preload; as=style; nopush
+Referrer-Policy: strict-origin-when-cross-origin
+Set-Cookie: _book_reviews_session=544d3e436af4aac5db7dfca05277e9a2; path=/; expires=Thu, 17 Sep 2026 01:37:16 GMT; secure; httponly; samesite=lax
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+Vary: Accept
+X-App-Instance: book-reviews-web-5b8cdc6f7b-fc5jb
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-Request-Id: 40341aa6-a8b1-408d-8a59-fdd67c59b194
+X-Runtime: 0.018529
+X-Xss-Protection: 0
+Date: Wed, 16 Sep 2026 01:37:16 GMT
+
