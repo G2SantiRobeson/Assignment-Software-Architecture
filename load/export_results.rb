@@ -21,7 +21,7 @@ CSV.open(File.join(directory, "requests.csv"), "w") do |csv|
     next unless sample["type"] == "Point" && sample["metric"] == "response_time_by_instance"
     data = sample.fetch("data")
     tags = data.fetch("tags")
-    csv << [data["time"], tags["endpoint"], tags["deployment"], tags["instance"], tags["status"], data["value"]]
+    csv << [ data["time"], tags["endpoint"], tags["deployment"], tags["instance"], tags["status"], data["value"] ]
     responses += 1
   end
 end
@@ -44,7 +44,7 @@ if run["kubernetesContext"].to_s.empty?
     File.foreach(File.join(directory, "containers.jsonl")) do |line|
       row = JSON.parse(line)
       stats = row.fetch("stats")
-      csv << [row["timestamp"], stats["ID"], stats["Name"], stats["CPUPerc"].delete_suffix("%"), stats["MemUsage"], stats["MemPerc"].delete_suffix("%"), row["threads"], stats["PIDs"]]
+      csv << [ row["timestamp"], stats["ID"], stats["Name"], stats["CPUPerc"].delete_suffix("%"), stats["MemUsage"], stats["MemPerc"].delete_suffix("%"), row["threads"], stats["PIDs"] ]
     end
   end
 end
