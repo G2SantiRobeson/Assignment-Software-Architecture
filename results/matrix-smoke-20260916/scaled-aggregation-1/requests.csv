@@ -1,0 +1,2 @@
+timestamp,endpoint,deployment,instance,status,response_time_ms
+2026-09-17T02:03:07.925065625Z,aggregation,scaled,759fc9d203aa,200,162.663875

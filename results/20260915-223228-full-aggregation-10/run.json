@@ -1,0 +1,8 @@
+{
+    "durationSeconds":  10,
+    "startedUtc":  "2026-09-16T01:32:45.5626604Z",
+    "deployment":  "full",
+    "endpoint":  "aggregation",
+    "requests":  10,
+    "url":  "https://app.localhost/reports/top-selling-books"
+}

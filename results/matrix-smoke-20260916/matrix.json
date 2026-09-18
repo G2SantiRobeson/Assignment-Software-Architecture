@@ -1,0 +1,23 @@
+﻿{
+    "results":  "C:\\Users\\chens\\OneDrive\\Escritorio\\software_architecture\\Assignment-1-Software-Architecture\\results\\matrix-smoke-20260916",
+    "startedUtc":  "2026-09-17T02:01:16.9572315Z",
+    "baseUrl":  "https://app.localhost",
+    "durationSeconds":  3,
+    "pid":  24440,
+    "project":  "book-reviews-a4",
+    "completedCases":  8,
+    "completedUtc":  "2026-09-17T02:03:43.6412222Z",
+    "clusterRestoreExitCode":  0,
+    "deployment":  "scaled",
+    "status":  "completed",
+    "endpoints":  [
+                      "static",
+                      "aggregation",
+                      "search",
+                      "book"
+                  ],
+    "counts":  [
+                   1
+               ],
+    "totalCases":  8
+}

@@ -1,0 +1,6 @@
+{"id":"a42d74844cf7","name":"book-reviews-a4-web-1","service":"web","nano_cpus":0,"image":"sha256:a2371a1754945a05e5265ad0b0562d5523b18d485dc661b01f8b7c906cb0a4ec","memory_limit_bytes":0}
+{"id":"69b93e454d61","name":"book-reviews-a4-static-1","service":"static","nano_cpus":0,"image":"sha256:a2371a1754945a05e5265ad0b0562d5523b18d485dc661b01f8b7c906cb0a4ec","memory_limit_bytes":0}
+{"id":"ca43277e8356","name":"book-reviews-a4-db-1","service":"db","nano_cpus":0,"image":"sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685","memory_limit_bytes":0}
+{"id":"87235cf2e925","name":"book-reviews-a4-redis-1","service":"redis","nano_cpus":0,"image":"sha256:02f2cc4882f8bf87c79a220ac958f58c700bdec0dfb9b9ea61b62fb0e8f1bfcf","memory_limit_bytes":201326592}
+{"id":"9848c97527b3","name":"book-reviews-a4-traefik-1","service":"traefik","nano_cpus":0,"image":"sha256:34d5089d0b414945342848518b383f11f5b3a645504ed87b77ffeb9d683d0e48","memory_limit_bytes":0}
+{"id":"48f7e9560c08","name":"book-reviews-a4-opensearch-1","service":"opensearch","nano_cpus":0,"image":"sha256:798cf28e226a32f5c928dd1ed9478dd3a33d2212176aad3679020088ad3afa1a","memory_limit_bytes":1610612736}

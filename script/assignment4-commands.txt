@@ -102,6 +102,25 @@ The verifier also checks a real Redis cache hit, shared session keys and the act
 search backend with assignment4:verify_dependencies.
 
 LOAD TESTS
+Complete sequential comparison (40 cases, about 3h20 plus preparation):
+  ./script/load_matrix.ps1 -PauseK3dCluster book-reviews-a4
+The existing book-reviews:assignment4 and grafana/k6:1.6.1 images must be available.
+The script explicitly scales Rails to one, runs the full matrix, then scales to
+three and repeats it. PostgreSQL/Redis/OpenSearch/uploads remain the same.
+PauseK3dCluster is optional; it stops that local cluster to avoid resource
+contention and restarts it in finally. Avoid other workloads during measurement.
+It does not build images or run concurrent load cases.
+To resume an interrupted run, pass the same parameters and its results directory:
+  ./script/load_matrix.ps1 -ResultsDir results/matrix-YYYYMMDD-HHMMSS -PauseK3dCluster book-reviews-a4
+Check progress from another PowerShell terminal:
+  ./script/load_status.ps1 -ResultsDir results/matrix-YYYYMMDD-HHMMSS
+Only validated completed.json cases are skipped. Incomplete attempts are renamed
+and preserved. matrix.json records progress/failure and comparison.csv contains
+measured timing summaries after all cases complete. Keep the machine awake and
+Docker running. Abruptly killing PowerShell cannot run cluster cleanup; if needed:
+  ./tmp/tools/k3d.exe cluster start book-reviews-a4
+
+Individual deployment measurements:
   ./script/load_test.ps1 -Deployment full
   ./script/load_test.ps1 -Deployment scaled
 Run these after starting the matching deployment, sequentially on the same machine.
@@ -134,10 +153,25 @@ Each results/<timestamp>-<deployment>-<endpoint>-<count>/ contains:
   run.json: parameters and timestamp
   samples.json: raw k6 durations/status codes, custom instance counters
   summary.json: k6 summary and threshold outcomes
-  containers.jsonl: Docker CPU, memory, PIDs samples
-  threads.jsonl: per-process PID/NLWP (thread count), or /proc status in Kubernetes
+  containers.jsonl / containers.csv: Docker CPU, memory, summed threads, PIDs
+  processes.jsonl / processes.csv: per-process CPU%, RSS bytes, virtual bytes,
+    threads, PID, start time, container identity and sample timestamp (Compose)
+  requests.csv: one row per request, status, response time in ms, serving instance
+  container-identities.jsonl: container names/images/services/resource limits
+  metrics-metadata.json: process counter units and CPU interpretation
+  threads.jsonl: total container threads, or /proc status in Kubernetes
   kubernetes-usage.jsonl: pod/container CPU and memory via metrics-server
   collector.log and traefik.jsonl: collection/edge evidence
 The collector adds some overhead. k6 skips trust only for the local self-signed
 certificate; functional verification separately checks certificate trust/SAN.
+Compose process CPU uses deltas of Linux /proc/PID/stat user+system ticks divided
+by elapsed time and CLK_TCK; 100% means one CPU, so values can exceed 100%.
+The first observation has a blank CPU value because it has no prior interval.
+RSS includes shared pages, so process RSS sums need not equal container memory.
+Samples are taken about every five seconds plus collection time; very short-lived
+processes between samples may not appear. The sampler shell/children are excluded.
+The Docker PIDs field counts kernel tasks; explicit process thread counts are
+captured separately. Collection starts before k6 and includes a final sample.
+Kubernetes retains its metrics-server CPU/memory and process thread collector;
+the per-process CPU/RSS extension and automatic matrix target Docker Compose.
 Results stay ignored by Git and are not an assignment report or invented analysis.

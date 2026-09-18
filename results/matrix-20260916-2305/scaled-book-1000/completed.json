@@ -1,0 +1,6 @@
+{
+    "baseUrl":  "https://app.localhost",
+    "durationSeconds":  300,
+    "requests":  1000,
+    "completedUtc":  "2026-09-17T05:14:34.5445953Z"
+}
