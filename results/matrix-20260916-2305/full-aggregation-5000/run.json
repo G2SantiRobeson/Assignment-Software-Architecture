@@ -1,0 +1,11 @@
+{
+    "url":  "https://app.localhost/reports/top-selling-books",
+    "durationSeconds":  300,
+    "startedUtc":  "2026-09-17T03:33:57.7071159Z",
+    "project":  "book-reviews-a4",
+    "kubernetesContext":  "",
+    "requests":  5000,
+    "deployment":  "full",
+    "endpoint":  "aggregation",
+    "expectedReplicas":  1
+}

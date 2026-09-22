@@ -36,6 +36,8 @@
 
 # Ignore locally materialized Kubernetes credentials and database exports.
 /k8s/secret.yaml
+/k8s/generated/
+
 *.sql
 *.dump
 *.sqlite

@@ -1,4 +1,4 @@
-# Local university deployment only: security disabled, reconstructable emptyDir.
+# Local university deployment only: internal service with security disabled.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,4 +44,4 @@ spec:
             - { name: search-data, mountPath: /usr/share/opensearch/data }
       volumes:
         - name: search-data
-          emptyDir: {}
+          persistentVolumeClaim: { claimName: book-reviews-search-data }

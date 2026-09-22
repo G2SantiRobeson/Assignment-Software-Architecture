@@ -1,0 +1,52 @@
+PASS: GET /up
+PASS: GET /ready
+PASS: GET /books
+PASS: GET /authors
+PASS: GET /reports/author-statistics
+PASS: GET /reports/top-rated-books
+PASS: GET /reports/top-selling-books
+PASS: author multipart upload with CSRF
+PASS: shared flash session across redirect
+PASS: author image bytes
+PASS: book cover upload with CSRF
+PASS: CSRF session accepted across different replicas
+PASS: book cover bytes
+PASS: image HTTP cache headers
+PASS: image conditional cache hit
+PASS: image served by static origin through Traefik
+PASS: compiled CSS
+PASS: CSS through static origin
+PASS: search page
+PASS: expected search backend
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: dynamic detail
+PASS: traffic distribution {"book-reviews-web-556fdf78ff-kds6d"=>15, "book-reviews-web-556fdf78ff-jllvc"=>13, "book-reviews-web-556fdf78ff-m92cv"=>14}
+{"results":[{"method":"get","path":"/up","status":200,"instance":null},{"method":"get","path":"/ready","status":200,"instance":null},{"method":"get","path":"/books","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/authors","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/reports/author-statistics","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/reports/top-rated-books","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/reports/top-selling-books","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/authors/new","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"post","path":"/authors","status":302,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/authors/52","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/uploads/89hgz4mn66pcsf4d2ruysgzq40s1.png","status":200,"instance":null},{"method":"get","path":"/books/new","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"post","path":"/books","status":302,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/uploads/9lme55ymp8pjalybpms59ko6wo26.png","status":200,"instance":null},{"method":"get","path":"/uploads/9lme55ymp8pjalybpms59ko6wo26.png","status":304,"instance":null},{"method":"get","path":"/assets/application-9f6effe6.css","status":200,"instance":null},{"method":"get","path":"/book-search?q=Architecture","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-jllvc"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-kds6d"},{"method":"get","path":"/books/302","status":200,"instance":"book-reviews-web-556fdf78ff-m92cv"}],"instances":{"book-reviews-web-556fdf78ff-kds6d":15,"book-reviews-web-556fdf78ff-jllvc":13,"book-reviews-web-556fdf78ff-m92cv":14},"book_path":"/books/302","image_path":"/uploads/9lme55ymp8pjalybpms59ko6wo26.png"}

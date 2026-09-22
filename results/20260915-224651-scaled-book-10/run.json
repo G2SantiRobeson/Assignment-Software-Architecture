@@ -1,0 +1,8 @@
+{
+    "durationSeconds":  10,
+    "startedUtc":  "2026-09-16T01:47:36.3319523Z",
+    "deployment":  "scaled",
+    "endpoint":  "book",
+    "requests":  10,
+    "url":  "https://app.localhost:8443/books/303"
+}

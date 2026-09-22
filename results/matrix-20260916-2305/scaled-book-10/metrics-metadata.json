@@ -1,0 +1,7 @@
+{
+    "cpu_percent_basis":  "100 percent = one logical CPU",
+    "page_bytes":  4096,
+    "interval_seconds":  5,
+    "clock_ticks_per_second":  100,
+    "process_memory":  "RSS; shared pages can appear in multiple processes"
+}

@@ -1,0 +1,11 @@
+{
+    "url":  "https://app.localhost/books/302",
+    "durationSeconds":  3,
+    "startedUtc":  "2026-09-17T02:03:29.0774881Z",
+    "project":  "book-reviews-a4",
+    "kubernetesContext":  "",
+    "requests":  1,
+    "deployment":  "scaled",
+    "endpoint":  "book",
+    "expectedReplicas":  3
+}

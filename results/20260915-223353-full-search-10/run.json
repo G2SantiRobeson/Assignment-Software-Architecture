@@ -1,0 +1,8 @@
+{
+    "durationSeconds":  10,
+    "startedUtc":  "2026-09-16T01:34:25.8084829Z",
+    "deployment":  "full",
+    "endpoint":  "search",
+    "requests":  10,
+    "url":  "https://app.localhost/book-search?q=architecture"
+}

@@ -13,3 +13,8 @@ resources:
   - redis-service.yaml
   - opensearch-deployment.yaml
   - opensearch-service.yaml
+  - shared-pvcs.yaml
+  - static.yaml
+  - traefik.yaml
+  - ingress.yaml
+  - generated/tls.yaml

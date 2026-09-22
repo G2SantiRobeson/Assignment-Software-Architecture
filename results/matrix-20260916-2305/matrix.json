@@ -1,0 +1,27 @@
+﻿{
+    "results":  "C:\\Users\\chens\\OneDrive\\Escritorio\\software_architecture\\Assignment-1-Software-Architecture\\results\\matrix-20260916-2305",
+    "startedUtc":  "2026-09-17T02:04:25.5849518Z",
+    "baseUrl":  "https://app.localhost",
+    "durationSeconds":  300,
+    "pid":  11680,
+    "project":  "book-reviews-a4",
+    "completedCases":  40,
+    "completedUtc":  "2026-09-17T05:35:36.7085964Z",
+    "clusterRestoreExitCode":  0,
+    "deployment":  "scaled",
+    "status":  "completed",
+    "endpoints":  [
+                      "static",
+                      "aggregation",
+                      "search",
+                      "book"
+                  ],
+    "counts":  [
+                   1,
+                   10,
+                   100,
+                   1000,
+                   5000
+               ],
+    "totalCases":  40
+}

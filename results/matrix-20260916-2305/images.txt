@@ -1,0 +1,2 @@
+﻿sha256:a2371a1754945a05e5265ad0b0562d5523b18d485dc661b01f8b7c906cb0a4ec ["book-reviews:assignment4"]
+sha256:a5ad6bc089a08d77c3ec49f3db8c6fa7a148e4073efcac44c675dbaf3568d8e1 ["grafana/k6:1.6.1"]

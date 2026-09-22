@@ -1,0 +1,11 @@
+timestamp,endpoint,deployment,instance,status,response_time_ms
+2026-09-17T02:25:57.907108291Z,static,full,edge-files,200,4.37165
+2026-09-17T02:26:27.895279537Z,static,full,edge-files,200,2.56641
+2026-09-17T02:26:57.894545962Z,static,full,edge-files,200,3.000154
+2026-09-17T02:27:27.89425477Z,static,full,edge-files,200,2.74171
+2026-09-17T02:27:57.892452109Z,static,full,edge-files,200,2.981755
+2026-09-17T02:28:27.890985252Z,static,full,edge-files,200,2.505385
+2026-09-17T02:28:57.889373599Z,static,full,edge-files,200,2.783781
+2026-09-17T02:29:27.888861559Z,static,full,edge-files,200,2.874457
+2026-09-17T02:29:57.894108768Z,static,full,edge-files,200,4.590206
+2026-09-17T02:30:27.884982227Z,static,full,edge-files,200,2.448509

@@ -1,0 +1,11 @@
+{
+    "url":  "https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png",
+    "durationSeconds":  300,
+    "startedUtc":  "2026-09-17T02:04:46.4545412Z",
+    "project":  "book-reviews-a4",
+    "kubernetesContext":  "",
+    "requests":  1,
+    "deployment":  "full",
+    "endpoint":  "static",
+    "expectedReplicas":  1
+}

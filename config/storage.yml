@@ -1,0 +1,7 @@
+shared:
+  service: Disk
+  root: <%= ENV.fetch("UPLOADS_PATH") { Rails.root.join("storage") }.to_json %>
+
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage").to_s.to_json %>

@@ -1,0 +1,13 @@
+timestamp,container,name,cpu_percent,memory_usage,memory_percent,threads,pids
+2026-09-17T02:01:55.7171281Z,69b93e454d61,book-reviews-a4-static-1,0.01,23.03MiB / 15.17GiB,0.15,9,9
+2026-09-17T02:01:55.7171281Z,aa08aea9ae94,book-reviews-a4-web-1,0.01,102.9MiB / 15.17GiB,0.66,10,10
+2026-09-17T02:01:55.7171281Z,ca43277e8356,book-reviews-a4-db-1,2.99,47.93MiB / 15.17GiB,0.31,7,7
+2026-09-17T02:01:55.7171281Z,87235cf2e925,book-reviews-a4-redis-1,0.26,7.664MiB / 192MiB,3.99,6,6
+2026-09-17T02:01:55.7171281Z,9848c97527b3,book-reviews-a4-traefik-1,0.12,107.7MiB / 15.17GiB,0.69,17,17
+2026-09-17T02:01:55.7171281Z,48f7e9560c08,book-reviews-a4-opensearch-1,0.79,1.403GiB / 1.5GiB,93.53,123,123
+2026-09-17T02:02:03.6506292Z,69b93e454d61,book-reviews-a4-static-1,2.84,22.9MiB / 15.17GiB,0.15,9,9
+2026-09-17T02:02:03.6506292Z,aa08aea9ae94,book-reviews-a4-web-1,0.01,106.3MiB / 15.17GiB,0.68,10,10
+2026-09-17T02:02:03.6506292Z,ca43277e8356,book-reviews-a4-db-1,2.77,49.07MiB / 15.17GiB,0.32,7,7
+2026-09-17T02:02:03.6506292Z,87235cf2e925,book-reviews-a4-redis-1,0.29,8.246MiB / 192MiB,4.29,6,6
+2026-09-17T02:02:03.6506292Z,9848c97527b3,book-reviews-a4-traefik-1,0.18,107.6MiB / 15.17GiB,0.69,17,17
+2026-09-17T02:02:03.6506292Z,48f7e9560c08,book-reviews-a4-opensearch-1,0.65,1.403GiB / 1.5GiB,93.55,123,123

@@ -1,0 +1,137 @@
+[36mINFO[0m[0000] Stopping cluster 'book-reviews-a4'           
+[36mINFO[0m[0007] Stopped cluster 'book-reviews-a4'            
+Starting full / static / 1 requests / 300s at 2026-09-17T02:04:46.4545412Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-static-1
+Starting full / aggregation / 1 requests / 300s at 2026-09-17T02:10:02.4627718Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-aggregation-1
+Starting full / search / 1 requests / 300s at 2026-09-17T02:15:18.3259875Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-search-1
+Starting full / book / 1 requests / 300s at 2026-09-17T02:20:35.4365630Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-book-1
+Starting full / static / 10 requests / 300s at 2026-09-17T02:25:52.2452408Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-static-10
+Starting full / aggregation / 10 requests / 300s at 2026-09-17T02:31:07.4868089Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-aggregation-10
+Starting full / search / 10 requests / 300s at 2026-09-17T02:36:20.3292355Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-search-10
+Starting full / book / 10 requests / 300s at 2026-09-17T02:41:35.2919511Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-book-10
+Starting full / static / 100 requests / 300s at 2026-09-17T02:46:47.2563538Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-static-100
+Starting full / aggregation / 100 requests / 300s at 2026-09-17T02:52:03.7579259Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-aggregation-100
+Starting full / search / 100 requests / 300s at 2026-09-17T02:57:14.4581030Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-search-100
+Starting full / book / 100 requests / 300s at 2026-09-17T03:02:29.3621884Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-book-100
+Starting full / static / 1000 requests / 300s at 2026-09-17T03:07:40.9903109Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-static-1000
+Starting full / aggregation / 1000 requests / 300s at 2026-09-17T03:12:54.8210040Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-aggregation-1000
+Starting full / search / 1000 requests / 300s at 2026-09-17T03:18:08.0518212Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-search-1000
+Starting full / book / 1000 requests / 300s at 2026-09-17T03:23:24.0623621Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-book-1000
+Starting full / static / 5000 requests / 300s at 2026-09-17T03:28:41.6671844Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-static-5000
+Starting full / aggregation / 5000 requests / 300s at 2026-09-17T03:33:57.7071159Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-aggregation-5000
+Starting full / search / 5000 requests / 300s at 2026-09-17T03:39:16.2588676Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-search-5000
+Starting full / book / 5000 requests / 300s at 2026-09-17T03:44:37.5648777Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/full-book-5000
+Starting scaled / static / 1 requests / 300s at 2026-09-17T03:50:09.3249546Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-static-1
+Starting scaled / aggregation / 1 requests / 300s at 2026-09-17T03:55:28.4463642Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-aggregation-1
+Starting scaled / search / 1 requests / 300s at 2026-09-17T04:00:44.0341633Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-search-1
+Starting scaled / book / 1 requests / 300s at 2026-09-17T04:06:03.4861413Z
+Validated 1 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-book-1
+Starting scaled / static / 10 requests / 300s at 2026-09-17T04:11:19.0874147Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-static-10
+Starting scaled / aggregation / 10 requests / 300s at 2026-09-17T04:16:37.9332912Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-aggregation-10
+Starting scaled / search / 10 requests / 300s at 2026-09-17T04:21:55.8641748Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-search-10
+Starting scaled / book / 10 requests / 300s at 2026-09-17T04:27:11.5744171Z
+Validated 10 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-book-10
+Starting scaled / static / 100 requests / 300s at 2026-09-17T04:32:29.2614251Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-static-100
+Starting scaled / aggregation / 100 requests / 300s at 2026-09-17T04:37:41.8652985Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-aggregation-100
+Starting scaled / search / 100 requests / 300s at 2026-09-17T04:43:02.1999091Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-search-100
+Starting scaled / book / 100 requests / 300s at 2026-09-17T04:48:14.3069015Z
+Validated 100 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-book-100
+Starting scaled / static / 1000 requests / 300s at 2026-09-17T04:53:33.4125578Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-static-1000
+Starting scaled / aggregation / 1000 requests / 300s at 2026-09-17T04:58:48.1658223Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-aggregation-1000
+Starting scaled / search / 1000 requests / 300s at 2026-09-17T05:04:06.3720860Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-search-1000
+Starting scaled / book / 1000 requests / 300s at 2026-09-17T05:09:24.1774594Z
+Validated 1000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-book-1000
+Starting scaled / static / 5000 requests / 300s at 2026-09-17T05:14:34.5493020Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-static-5000
+Starting scaled / aggregation / 5000 requests / 300s at 2026-09-17T05:19:53.5359961Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-aggregation-5000
+Starting scaled / search / 5000 requests / 300s at 2026-09-17T05:25:04.8834966Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-search-5000
+Starting scaled / book / 5000 requests / 300s at 2026-09-17T05:30:16.5630925Z
+Validated 5000 requests; exported CSV files.
+Captured C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305/scaled-book-5000
+[36mINFO[0m[0000] Using the k3d-tools node to gather environment information 
+[36mINFO[0m[0000] Starting existing tools node k3d-book-reviews-a4-tools... 
+[36mINFO[0m[0000] Starting node 'k3d-book-reviews-a4-tools'    
+[36mINFO[0m[0000] Starting new tools node...                   
+[36mINFO[0m[0000] Starting node 'k3d-book-reviews-a4-tools'    
+[36mINFO[0m[0002] Starting cluster 'book-reviews-a4'           
+[36mINFO[0m[0002] Starting servers...                          
+[36mINFO[0m[0002] Starting node 'k3d-book-reviews-a4-server-0' 
+[36mINFO[0m[0005] All agents already running.                  
+[36mINFO[0m[0005] Starting helpers...                          
+[36mINFO[0m[0005] Starting node 'k3d-book-reviews-a4-tools'    
+[36mINFO[0m[0005] Starting node 'k3d-book-reviews-a4-serverlb' 
+[36mINFO[0m[0011] Injecting records for hostAliases (incl. host.k3d.internal) and for 3 network members into CoreDNS configmap... 
+[36mINFO[0m[0013] Started cluster 'book-reviews-a4'            
+Completed matrix: C:\Users\chens\OneDrive\Escritorio\software_architecture\Assignment-1-Software-Architecture\results\matrix-20260916-2305

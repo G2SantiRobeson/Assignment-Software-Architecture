@@ -41,6 +41,7 @@ RUN bundle install && \
 
 # Copy application code
 COPY . .
+RUN chmod +x bin/* && mkdir -p storage tmp/pids
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
@@ -69,6 +70,7 @@ USER 1000:1000
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
+# Keep the earlier image default; Assignment 4 explicitly starts Puma behind Traefik.
+ENV PORT=3000 BINDING=0.0.0.0
+EXPOSE 80 3000
 CMD ["./bin/thrust", "./bin/rails", "server"]
