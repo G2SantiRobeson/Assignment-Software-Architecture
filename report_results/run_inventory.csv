@@ -1,0 +1,62 @@
+﻿deployment,endpoint,requests_target,raw_deployment,duration_seconds,expected_replicas,selected,url,directory,reason
+single,aggregation,10,full,10,,False,https://app.localhost/reports/top-selling-books,results/20260915-223228-full-aggregation-10,Duración distinta de 300 s
+single,static,10,full,10,,False,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/20260915-223228-full-static-10,Duración distinta de 300 s
+single,aggregation,10,full,10,,False,https://app.localhost/reports/top-selling-books,results/20260915-223353-full-aggregation-10,Duración distinta de 300 s
+single,book,10,full,10,,False,https://app.localhost/books/302,results/20260915-223353-full-book-10,Duración distinta de 300 s
+single,search,10,full,10,,False,https://app.localhost/book-search?q=architecture,results/20260915-223353-full-search-10,Duración distinta de 300 s
+single,static,10,full,10,,False,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/20260915-223353-full-static-10,Duración distinta de 300 s
+single,book,5000,full,300,,False,https://app.localhost/books/302,results/20260915-223605-full-book-5000,Ejecución histórica separada; sin expectedReplicas ni métricas de CPU/RSS por proceso
+x3,book,5000,scaled,300,,False,https://app.localhost/books/302,results/20260915-224344-scaled-book-5000,Ejecución histórica separada; sin expectedReplicas ni métricas de CPU/RSS por proceso
+x3,aggregation,10,scaled,10,,False,https://app.localhost:8443/reports/top-selling-books,results/20260915-224651-scaled-aggregation-10,Duración distinta de 300 s
+x3,book,10,scaled,10,,False,https://app.localhost:8443/books/303,results/20260915-224651-scaled-book-10,Duración distinta de 300 s
+x3,search,10,scaled,10,,False,https://app.localhost:8443/book-search?q=architecture,results/20260915-224651-scaled-search-10,Duración distinta de 300 s
+x3,static,10,scaled,10,,False,https://app.localhost:8443/uploads/mar3rv3j1m3gipa2ug3luvuyu8lx.png,results/20260915-224651-scaled-static-10,Duración distinta de 300 s
+x3,static,1,scaled,3,,False,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/20260915-225147-scaled-static-1,Duración distinta de 300 s
+single,aggregation,1,full,300,1,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/full-aggregation-1,Matriz principal 300 s
+single,aggregation,10,full,300,1,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/full-aggregation-10,Matriz principal 300 s
+single,aggregation,100,full,300,1,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/full-aggregation-100,Matriz principal 300 s
+single,aggregation,1000,full,300,1,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/full-aggregation-1000,Matriz principal 300 s
+single,aggregation,5000,full,300,1,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/full-aggregation-5000,Matriz principal 300 s
+single,book,1,full,300,1,True,https://app.localhost/books/302,results/matrix-20260916-2305/full-book-1,Matriz principal 300 s
+single,book,10,full,300,1,True,https://app.localhost/books/302,results/matrix-20260916-2305/full-book-10,Matriz principal 300 s
+single,book,100,full,300,1,True,https://app.localhost/books/302,results/matrix-20260916-2305/full-book-100,Matriz principal 300 s
+single,book,1000,full,300,1,True,https://app.localhost/books/302,results/matrix-20260916-2305/full-book-1000,Matriz principal 300 s
+single,book,5000,full,300,1,True,https://app.localhost/books/302,results/matrix-20260916-2305/full-book-5000,Matriz principal 300 s
+single,search,1,full,300,1,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/full-search-1,Matriz principal 300 s
+single,search,10,full,300,1,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/full-search-10,Matriz principal 300 s
+single,search,100,full,300,1,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/full-search-100,Matriz principal 300 s
+single,search,1000,full,300,1,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/full-search-1000,Matriz principal 300 s
+single,search,5000,full,300,1,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/full-search-5000,Matriz principal 300 s
+single,static,1,full,300,1,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/full-static-1,Matriz principal 300 s
+single,static,10,full,300,1,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/full-static-10,Matriz principal 300 s
+single,static,100,full,300,1,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/full-static-100,Matriz principal 300 s
+single,static,1000,full,300,1,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/full-static-1000,Matriz principal 300 s
+single,static,5000,full,300,1,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/full-static-5000,Matriz principal 300 s
+x3,aggregation,1,scaled,300,3,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/scaled-aggregation-1,Matriz principal 300 s
+x3,aggregation,10,scaled,300,3,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/scaled-aggregation-10,Matriz principal 300 s
+x3,aggregation,100,scaled,300,3,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/scaled-aggregation-100,Matriz principal 300 s
+x3,aggregation,1000,scaled,300,3,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/scaled-aggregation-1000,Matriz principal 300 s
+x3,aggregation,5000,scaled,300,3,True,https://app.localhost/reports/top-selling-books,results/matrix-20260916-2305/scaled-aggregation-5000,Matriz principal 300 s
+x3,book,1,scaled,300,3,True,https://app.localhost/books/302,results/matrix-20260916-2305/scaled-book-1,Matriz principal 300 s
+x3,book,10,scaled,300,3,True,https://app.localhost/books/302,results/matrix-20260916-2305/scaled-book-10,Matriz principal 300 s
+x3,book,100,scaled,300,3,True,https://app.localhost/books/302,results/matrix-20260916-2305/scaled-book-100,Matriz principal 300 s
+x3,book,1000,scaled,300,3,True,https://app.localhost/books/302,results/matrix-20260916-2305/scaled-book-1000,Matriz principal 300 s
+x3,book,5000,scaled,300,3,True,https://app.localhost/books/302,results/matrix-20260916-2305/scaled-book-5000,Matriz principal 300 s
+x3,search,1,scaled,300,3,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/scaled-search-1,Matriz principal 300 s
+x3,search,10,scaled,300,3,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/scaled-search-10,Matriz principal 300 s
+x3,search,100,scaled,300,3,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/scaled-search-100,Matriz principal 300 s
+x3,search,1000,scaled,300,3,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/scaled-search-1000,Matriz principal 300 s
+x3,search,5000,scaled,300,3,True,https://app.localhost/book-search?q=architecture,results/matrix-20260916-2305/scaled-search-5000,Matriz principal 300 s
+x3,static,1,scaled,300,3,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/scaled-static-1,Matriz principal 300 s
+x3,static,10,scaled,300,3,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/scaled-static-10,Matriz principal 300 s
+x3,static,100,scaled,300,3,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/scaled-static-100,Matriz principal 300 s
+x3,static,1000,scaled,300,3,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/scaled-static-1000,Matriz principal 300 s
+x3,static,5000,scaled,300,3,True,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-20260916-2305/scaled-static-5000,Matriz principal 300 s
+single,aggregation,1,full,3,1,False,https://app.localhost/reports/top-selling-books,results/matrix-smoke-20260916/full-aggregation-1,Duración distinta de 300 s
+single,book,1,full,3,1,False,https://app.localhost/books/302,results/matrix-smoke-20260916/full-book-1,Duración distinta de 300 s
+single,search,1,full,3,1,False,https://app.localhost/book-search?q=architecture,results/matrix-smoke-20260916/full-search-1,Duración distinta de 300 s
+single,static,1,full,3,1,False,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-smoke-20260916/full-static-1,Duración distinta de 300 s
+x3,aggregation,1,scaled,3,3,False,https://app.localhost/reports/top-selling-books,results/matrix-smoke-20260916/scaled-aggregation-1,Duración distinta de 300 s
+x3,book,1,scaled,3,3,False,https://app.localhost/books/302,results/matrix-smoke-20260916/scaled-book-1,Duración distinta de 300 s
+x3,search,1,scaled,3,3,False,https://app.localhost/book-search?q=architecture,results/matrix-smoke-20260916/scaled-search-1,Duración distinta de 300 s
+x3,static,1,scaled,3,3,False,https://app.localhost/uploads/nztzg8ijlwxgzyr5r68m22clwusr.png,results/matrix-smoke-20260916/scaled-static-1,Duración distinta de 300 s
